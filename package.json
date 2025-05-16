@@ -1,0 +1,46 @@
+{
+  "name": "servernodejs",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node ./src/index.js",
+    "dev": "nodemon src/index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@libsql/client": "^0.14.0",
+    "@yosle/tropipayjs": "^0.1.28",
+    "axios": "^1.8.1",
+    "bcryptjs": "^2.4.3",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "4.21.2",
+    "express-flash": "^0.0.2",
+    "express-session": "^1.18.1",
+    "fs": "^0.0.1-security",
+    "googleapis": "^148.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "mime-types": "^3.0.1",
+    "morgan": "1.10.0",
+    "multer": "^1.4.5-lts.1",
+    "mysql": "2.18.1",
+    "mysql2": "^3.12.0",
+    "nodemailer": "^6.10.0",
+    "nodemon": "3.1.9",
+    "passport": "^0.7.0",
+    "passport-google-oauth20": "^2.0.0",
+    "sharp": "^0.33.5",
+    "socket.io": "^4.8.1",
+    "zod": "3.24.1"
+  },
+  "devDependencies": {
+    "@types/express": "5.0.0",
+    "@types/morgan": "1.9.9",
+    "tsx": "4.19.2"
+  }
+}
