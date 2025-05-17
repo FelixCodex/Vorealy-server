@@ -5,13 +5,25 @@ import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import flash from 'express-flash';
 import cors from 'cors';
+import passport from 'passport';
 
-import { UserRepositoryMemory } from './infrastructure/db/UserRepositoryMemory.js';
-import { createUserRouter } from './modules/user/User.routes.js';
+import UserRepository from './infrastructure/repositories/turso/userRepositoryTurso.js';
+import { configureGoogleStrategy } from './modules/auth/infrastructure/services/googlePassportStrategy.js';
 
 const app = express();
 
 dotenv.config();
+const sessionConfig = {
+	secret: SECRET_JWT_KEY,
+	resave: false,
+	saveUninitialized: true,
+	cookie: { secure: false },
+};
+
+configureGoogleStrategy(passport, {
+	userRepository: UserRepository,
+	CLIENT_URL,
+});
 
 app.use(
 	cors({
@@ -24,15 +36,9 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(flash());
 
-app.use(
-	session({
-		secret: SECRET_JWT_KEY,
-		resave: false,
-		saveUninitialized: true,
-		cookie: { secure: false },
-	})
-);
+app.use(session(sessionConfig));
 
-app.use('/app', createUserRouter(UserRepositoryMemory));
+app.use(passport.initialize());
+app.use(passport.session());
 
 export default app;
