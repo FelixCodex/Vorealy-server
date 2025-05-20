@@ -78,15 +78,18 @@ export default function createProjectController(projectRepository) {
 
 		async createProject(req, res) {
 			try {
+				const { workspaceId } = req.params;
 				const projectData = req.body;
 
-				// Si el usuario está autenticado, podemos obtener el id del usuario del request
 				if (req.user && req.user.id) {
 					projectData.createdBy = req.user.id;
 					projectData.updatedBy = req.user.id;
 				}
 
-				const newProject = await createProjectUseCase(projectData);
+				const newProject = await createProjectUseCase({
+					...projectData,
+					workspaceId,
+				});
 				return res.status(201).json({
 					success: true,
 					data: newProject,
@@ -105,7 +108,6 @@ export default function createProjectController(projectRepository) {
 				const { id } = req.params;
 				const projectData = req.body;
 
-				// Si el usuario está autenticado, podemos obtener el id del usuario que actualiza
 				if (req.user && req.user.id) {
 					projectData.updatedBy = req.user.id;
 				}

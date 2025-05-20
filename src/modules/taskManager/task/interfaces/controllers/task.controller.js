@@ -76,6 +76,7 @@ export default function createTaskController(taskRepository) {
 
 		async createTask(req, res) {
 			try {
+				const { workspaceId } = req.params;
 				const taskData = req.body;
 
 				if (req.user && req.user.id) {
@@ -83,7 +84,7 @@ export default function createTaskController(taskRepository) {
 					taskData.updatedBy = req.user.id;
 				}
 
-				const newTask = await createTaskUseCase(taskData);
+				const newTask = await createTaskUseCase({ ...taskData, workspaceId });
 				return res.status(201).json({
 					success: true,
 					data: newTask,

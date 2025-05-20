@@ -1,11 +1,16 @@
 import createWorkSpace from '../../use-cases/createWorkspace';
 import deleteWorkSpace from '../../use-cases/deleteWorkspace';
+import getUserWorkspaces from '../../use-cases/getUserWorkspaces';
+import getWorkspaceById from '../../use-cases/getWorkspaceById';
 import updateWorkSpace from '../../use-cases/updateWorkspace';
 
 export function AuthController(workspaceRepo) {
 	const createWSUseCase = createWorkSpace(workspaceRepo);
 	const updateWSUseCase = updateWorkSpace(workspaceRepo);
 	const deleteWSUseCase = deleteWorkSpace(workspaceRepo);
+	const getWSByIdUseCase = getWorkspaceById(workspaceRepo);
+	const getUserWSUseCase = getUserWorkspaces(workspaceRepo);
+
 	return {
 		async create(req, res) {
 			const userId = req.user.id;
@@ -21,6 +26,24 @@ export function AuthController(workspaceRepo) {
 				res.status(201).json(createdWorkspace);
 			} catch (err) {
 				res.status(400).json({ error: err.message });
+			}
+		},
+
+		async getUserWorkspaces(req, res) {
+			try {
+				const { userId } = req.params;
+				const workspaces = await getUserWSUseCase(userId);
+				return res.status(200).json(workspaces);
+			} catch (error) {
+				console.error(
+					'Error en WorkspaceMemberController.getUserWorkspaces:',
+					error
+				);
+				return res.status(500).json({
+					success: false,
+					message:
+						error.message || 'Error al obtener los workspaces del usuario',
+				});
 			}
 		},
 		async update(req, res) {
@@ -48,6 +71,14 @@ export function AuthController(workspaceRepo) {
 		async delete(req, res) {
 			const userId = req.user.id;
 			const { id } = req.params;
+
+			const workspace = await getWSByIdUseCase(id);
+
+			if (workspace.owner_id !== userId) {
+				return res
+					.status(403)
+					.json({ error: 'Usuario no es el propietario del workspace' });
+			}
 
 			try {
 				const result = await deleteWSUseCase(id, userId);

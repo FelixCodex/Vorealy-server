@@ -37,7 +37,6 @@ export const createWorkspaceMemberRouter = Repository => {
 		(req, res) => workspaceMemberController.getMember(req, res)
 	);
 
-	// Añadir un miembro al workspace
 	router.post(
 		'/workspaces/:workspaceId/members',
 		authRequiredMiddleware,
@@ -45,7 +44,6 @@ export const createWorkspaceMemberRouter = Repository => {
 		(req, res) => workspaceMemberController.addMember(req, res)
 	);
 
-	// Actualizar el rol de un miembro del workspace
 	router.put(
 		'/workspaces/:workspaceId/members/:userId',
 		authRequiredMiddleware,
@@ -53,7 +51,6 @@ export const createWorkspaceMemberRouter = Repository => {
 		(req, res) => workspaceMemberController.updateRole(req, res)
 	);
 
-	// Eliminar un miembro del workspace
 	router.delete(
 		'/workspaces/:workspaceId/members/:userId',
 		authRequiredMiddleware,

@@ -6,34 +6,21 @@ import removeAllWorkspaceMembers from '../../use-cases/removeAllWorkspaceMembers
 import removeWorkspaceMember from '../../use-cases/removeWorkspaceMember';
 import updateWorkspaceMemberRole from '../../use-cases/updateWorkspaceMemberRole';
 
-export default function createWorkspaceMemberController(
-	workspaceMemberRepository
-) {
-	const getWorkspaceMembersUseCase = getWorkspaceMembers(
-		workspaceMemberRepository
-	);
-	const getUserWorkspacesUseCase = getUserWorkspaces(workspaceMemberRepository);
-	const getWorkspaceMemberUseCase = getWorkspaceMember(
-		workspaceMemberRepository
-	);
-	const addWorkspaceMemberUseCase = addWorkspaceMember(
-		workspaceMemberRepository
-	);
-	const updateWorkspaceMemberRoleUseCase = updateWorkspaceMemberRole(
-		workspaceMemberRepository
-	);
-	const removeWorkspaceMemberUseCase = removeWorkspaceMember(
-		workspaceMemberRepository
-	);
-	const removeAllWorkspaceMembersUseCase = removeAllWorkspaceMembers(
-		workspaceMemberRepository
-	);
+export default function createWorkspaceMemberController(workspaceMemberRepo) {
+	const getWSMembersUseCase = getWorkspaceMembers(workspaceMemberRepo);
+	const getWSMemberUseCase = getWorkspaceMember(workspaceMemberRepo);
+	const addWSMemberUseCase = addWorkspaceMember(workspaceMemberRepo);
+	const updateWSMemberRoleUseCase =
+		updateWorkspaceMemberRole(workspaceMemberRepo);
+	const removeWSMemberUseCase = removeWorkspaceMember(workspaceMemberRepo);
+	const removeAllWSMembersUseCase =
+		removeAllWorkspaceMembers(workspaceMemberRepo);
 
 	return {
 		async getMembers(req, res) {
 			try {
 				const { workspaceId } = req.params;
-				const members = await getWorkspaceMembersUseCase(workspaceId);
+				const members = await getWSMembersUseCase(workspaceId);
 				return res.status(200).json(members);
 			} catch (error) {
 				console.error('Error en WorkspaceMemberController.getMembers:', error);
@@ -45,33 +32,14 @@ export default function createWorkspaceMemberController(
 			}
 		},
 
-		async getUserWorkspaces(req, res) {
-			try {
-				const { userId } = req.params;
-				const workspaces = await getUserWorkspacesUseCase(userId);
-				return res.status(200).json(workspaces);
-			} catch (error) {
-				console.error(
-					'Error en WorkspaceMemberController.getUserWorkspaces:',
-					error
-				);
-				return res.status(500).json({
-					success: false,
-					message:
-						error.message || 'Error al obtener los workspaces del usuario',
-				});
-			}
-		},
-
 		async getMember(req, res) {
 			try {
 				const { workspaceId, userId } = req.params;
-				const member = await getWorkspaceMemberUseCase(workspaceId, userId);
+				const member = await getWSMemberUseCase(workspaceId, userId);
 				return res.status(200).json(member);
 			} catch (error) {
 				console.error('Error en WorkspaceMemberController.getMember:', error);
 
-				// Si el usuario no es miembro, devuelve 404
 				if (error.message === 'Usuario no es miembro del workspace') {
 					return res.status(404).json({
 						success: false,
@@ -90,9 +58,9 @@ export default function createWorkspaceMemberController(
 			try {
 				const { workspaceId } = req.params;
 				const { userId, role } = req.body;
-				const invitedBy = req.user.id; // Asumiendo que tienes middleware de autenticación
+				const invitedBy = req.user.id;
 
-				const member = await addWorkspaceMemberUseCase({
+				const member = await addWSMemberUseCase({
 					workspaceId,
 					userId,
 					role,
@@ -103,7 +71,6 @@ export default function createWorkspaceMemberController(
 			} catch (error) {
 				console.error('Error en WorkspaceMemberController.addMember:', error);
 
-				// Si el usuario ya es miembro, devuelve 409 Conflict
 				if (error.message === 'El usuario ya es miembro de este workspace') {
 					return res.status(409).json({
 						success: false,
@@ -123,7 +90,7 @@ export default function createWorkspaceMemberController(
 				const { workspaceId, userId } = req.params;
 				const { role } = req.body;
 
-				const member = await updateWorkspaceMemberRoleUseCase(
+				const member = await updateWSMemberRoleUseCase(
 					workspaceId,
 					userId,
 					role
@@ -133,7 +100,6 @@ export default function createWorkspaceMemberController(
 			} catch (error) {
 				console.error('Error en WorkspaceMemberController.updateRole:', error);
 
-				// Si el usuario no es miembro, devuelve 404
 				if (error.message === 'El usuario no es miembro de este workspace') {
 					return res.status(404).json({
 						success: false,
@@ -141,7 +107,6 @@ export default function createWorkspaceMemberController(
 					});
 				}
 
-				// Si el rol no es válido, devuelve 400
 				if (error.message === 'Rol no válido') {
 					return res.status(400).json({
 						success: false,
@@ -160,7 +125,7 @@ export default function createWorkspaceMemberController(
 			try {
 				const { workspaceId, userId } = req.params;
 
-				const result = await removeWorkspaceMemberUseCase(workspaceId, userId);
+				const result = await removeWSMemberUseCase(workspaceId, userId);
 
 				return res.status(200).json(result);
 			} catch (error) {
@@ -169,7 +134,6 @@ export default function createWorkspaceMemberController(
 					error
 				);
 
-				// Si el usuario no es miembro, devuelve 404
 				if (error.message === 'El usuario no es miembro de este workspace') {
 					return res.status(404).json({
 						success: false,
@@ -189,7 +153,7 @@ export default function createWorkspaceMemberController(
 			try {
 				const { workspaceId } = req.params;
 
-				const result = await removeAllWorkspaceMembersUseCase(workspaceId);
+				const result = await removeAllWSMembersUseCase(workspaceId);
 
 				return res.status(200).json(result);
 			} catch (error) {

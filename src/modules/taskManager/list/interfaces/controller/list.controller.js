@@ -84,18 +84,11 @@ export default function ListController(listRepository, workspaceRepository) {
 				const listData = req.body;
 				const { workspaceId } = req.params;
 
-				if (!workspaceId) {
-					return res.status(400).json({
-						success: false,
-						message: 'El ID del workspace es requerido',
-					});
-				}
-
 				if (req.user && req.user.id) {
 					listData.createdBy = req.user.id;
 				}
 
-				const newList = await createListUseCase(listData);
+				const newList = await createListUseCase({ ...listData, workspaceId });
 				return res.status(201).json({
 					success: true,
 					data: newList,
@@ -111,20 +104,8 @@ export default function ListController(listRepository, workspaceRepository) {
 
 		async updateList(req, res) {
 			try {
-				const { id, workspaceId } = req.params;
+				const { id } = req.params;
 				const listData = req.body;
-
-				if (!workspaceId || !id) {
-					return res.status(400).json({
-						success: false,
-						message: 'El ID del workspace y el ID de la lista son requerido',
-					});
-				}
-
-				const list = await getListByIdUseCase(id);
-				if (list.workspace_id === workspaceId) {
-					throw new Error('Esta lista no pertenece al workspace');
-				}
 
 				const updatedList = await updateListUseCase(id, listData);
 				return res.status(200).json({

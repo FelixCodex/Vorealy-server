@@ -77,15 +77,18 @@ export default function FolderController(folderRepository) {
 
 		async createFolder(req, res) {
 			try {
+				const { workspaceId } = req.params;
 				const folderData = req.body;
 
-				// Si el usuario está autenticado, podemos obtener el id del usuario del request
 				if (req.user && req.user.id) {
 					folderData.createdBy = req.user.id;
 					folderData.updatedBy = req.user.id;
 				}
 
-				const newFolder = await createFolderUseCase(folderData);
+				const newFolder = await createFolderUseCase({
+					...folderData,
+					workspaceId,
+				});
 				return res.status(201).json({
 					success: true,
 					data: newFolder,
@@ -104,7 +107,6 @@ export default function FolderController(folderRepository) {
 				const { id } = req.params;
 				const folderData = req.body;
 
-				// Si el usuario está autenticado, podemos obtener el id del usuario que actualiza
 				if (req.user && req.user.id) {
 					folderData.updatedBy = req.user.id;
 				}
