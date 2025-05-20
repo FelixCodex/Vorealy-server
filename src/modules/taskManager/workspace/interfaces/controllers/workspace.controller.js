@@ -4,7 +4,7 @@ import getUserWorkspaces from '../../use-cases/getUserWorkspaces';
 import getWorkspaceById from '../../use-cases/getWorkspaceById';
 import updateWorkSpace from '../../use-cases/updateWorkspace';
 
-export function AuthController(workspaceRepo) {
+export function createWorkspaceController(workspaceRepo) {
 	const createWSUseCase = createWorkSpace(workspaceRepo);
 	const updateWSUseCase = updateWorkSpace(workspaceRepo);
 	const deleteWSUseCase = deleteWorkSpace(workspaceRepo);
@@ -48,11 +48,12 @@ export function AuthController(workspaceRepo) {
 		},
 		async update(req, res) {
 			const userId = req.user.id;
-			const { id, name, color, icon } = req.body;
+			const { workspaceId } = req.params;
+			const { name, color, icon } = req.body;
 
 			try {
 				const updatedWorkspace = await updateWSUseCase({
-					id,
+					id: workspaceId,
 					userId,
 					name,
 					color,
@@ -70,9 +71,9 @@ export function AuthController(workspaceRepo) {
 		},
 		async delete(req, res) {
 			const userId = req.user.id;
-			const { id } = req.params;
+			const { workspaceId } = req.params;
 
-			const workspace = await getWSByIdUseCase(id);
+			const workspace = await getWSByIdUseCase(workspaceId);
 
 			if (workspace.owner_id !== userId) {
 				return res
@@ -81,7 +82,7 @@ export function AuthController(workspaceRepo) {
 			}
 
 			try {
-				const result = await deleteWSUseCase(id, userId);
+				const result = await deleteWSUseCase(workspaceId, userId);
 				if (!result.success) {
 					return res.status(500).json({ error: 'Error deleting workspace' });
 				}

@@ -161,6 +161,8 @@ CREATE TABLE subtasks(
     task_id BINARY(16) NOT NULL,
     workspace_id BINARY(16) NOT NULL,
 
+    completed BOOLEAN DEFAULT false,
+
     start_date DATE,
     end_date DATE,
 

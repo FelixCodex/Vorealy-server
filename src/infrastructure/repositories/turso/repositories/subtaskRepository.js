@@ -11,6 +11,7 @@ export default class SubtaskRepository {
                     title, 
                     HEX(task_id) AS task_id, 
           			HEX(workspace_id) AS workspace_id, 
+					completed,
                     start_date, 
                     end_date, 
                     HEX(assigned_to) AS assigned_to, 
@@ -33,6 +34,7 @@ export default class SubtaskRepository {
                     title, 
                     HEX(task_id) AS task_id, 
           			HEX(workspace_id) AS workspace_id, 
+					completed,
                     start_date, 
                     end_date, 
                     HEX(assigned_to) AS assigned_to, 
@@ -57,6 +59,7 @@ export default class SubtaskRepository {
                     title, 
                     HEX(task_id) AS task_id, 
           			HEX(workspace_id) AS workspace_id, 
+					completed,
                     start_date, 
                     end_date, 
                     HEX(assigned_to) AS assigned_to, 
@@ -81,6 +84,7 @@ export default class SubtaskRepository {
                     title, 
                     HEX(task_id) AS task_id, 
           			HEX(workspace_id) AS workspace_id, 
+					completed,
                     start_date, 
                     end_date, 
                     HEX(assigned_to) AS assigned_to, 
@@ -165,6 +169,7 @@ export default class SubtaskRepository {
 	async update({
 		id,
 		title = null,
+		completed = null,
 		startDate = null,
 		endDate = null,
 		assignedTo = null,
@@ -179,6 +184,10 @@ export default class SubtaskRepository {
 			if (title !== null) {
 				updates.push('title = ?');
 				values.push(title);
+			}
+			if (completed !== null) {
+				updates.push('completed = ?');
+				values.push(completed);
 			}
 			if (startDate !== null) {
 				updates.push('start_date = ?');
@@ -216,6 +225,7 @@ export default class SubtaskRepository {
                     title, 
                     HEX(task_id) AS task_id,
           			HEX(workspace_id) AS workspace_id,  
+					completed,
                     start_date, 
                     end_date, 
                     HEX(assigned_to) AS assigned_to, 

@@ -9,8 +9,8 @@ export function configureGoogleStrategy(
 	passport.use(
 		new GoogleStrategy(
 			{
-				clientID: process.env.GOOGLE_CLIENT_ID,
-				clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+				clientID: process.env.GOOGLE_OAUTH_CLIENT_ID,
+				clientSecret: process.env.GOOGLE_OAUTH_CLIENT_SECRET,
 				callbackURL: CLIENT_URL + 'app/auth/google/callback',
 			},
 			async (accessToken, refreshToken, profile, done) => {

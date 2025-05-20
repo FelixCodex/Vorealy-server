@@ -6,7 +6,7 @@ import getFolderById from '../../use-cases/getFolderById';
 import getFoldersByProjectId from '../../use-cases/getFoldersByProjectId';
 import updateFolder from '../../use-cases/updateFolder';
 
-export default function FolderController(folderRepository) {
+export default function createFolderController(folderRepository) {
 	const getAllFoldersUseCase = getAllFolders(folderRepository);
 	const getFolderByIdUseCase = getFolderById(folderRepository);
 	const getFoldersByProjectIdUseCase = getFoldersByProjectId(folderRepository);

@@ -1,14 +1,14 @@
-export default function updateTask(taskRepository) {
+export default function updateSubTask(subtaskRepository) {
 	return async function (id, taskData) {
 		try {
-			const existingProject = await taskRepository.getById(id);
+			const existingProject = await subtaskRepository.getById(id);
 			if (!existingProject) {
 				throw new Error(`Proyecto con ID ${id} no encontrado`);
 			}
 
 			taskData.updatedAt = new Date().toISOString();
 
-			const updatedProject = await taskRepository.update({
+			const updatedProject = await subtaskRepository.update({
 				id,
 				...taskData,
 			});

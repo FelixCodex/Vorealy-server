@@ -4,7 +4,7 @@ const t = day * 38;
 const token_config = { ...TOKEN_CONFIG, maxAge: t };
 const auth_config = { scope: ['profile', 'email'] };
 
-export function GoogleController({ passport, CLIENT_URL }) {
+export function createGoogleController({ passport, CLIENT_URL }) {
 	return {
 		auth: passport.authenticate('google', auth_config)(req, res, next),
 

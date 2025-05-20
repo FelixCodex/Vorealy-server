@@ -1,4 +1,4 @@
-export default function creteTask(taskRepository) {
+export default function createTask(taskRepository) {
 	return async function (taskData) {
 		try {
 			if (!taskData.name || !taskData.workspaceId) {

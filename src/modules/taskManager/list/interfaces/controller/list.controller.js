@@ -5,11 +5,8 @@ import getAllLists from '../../use-cases/getAllLists';
 import getListById from '../../use-cases/getListById';
 import getListsByParent from '../../use-cases/getListsByParent';
 import updateList from '../../use-cases/updateList';
-import getFolderById from '../../../folder/use-cases/getFolderById';
-import getProjectById from '../../../project/use-cases/getProjectById';
-import getWorkspaceMember from '../../../workspace/use-cases/getWorkspaceMember';
 
-export default function ListController(listRepository, workspaceRepository) {
+export default function createListController(listRepository) {
 	const getAllListsUseCase = getAllLists(listRepository);
 	const getListByIdUseCase = getListById(listRepository);
 	const getListsByParentUseCase = getListsByParent(listRepository);
@@ -17,7 +14,6 @@ export default function ListController(listRepository, workspaceRepository) {
 	const updateListUseCase = updateList(listRepository);
 	const deleteListUseCase = deleteList(listRepository);
 	const deleteListsByParentUseCase = deleteListsByParent(listRepository);
-	const getWorkspaceMemberUseCase = getWorkspaceMember(workspaceRepository);
 
 	return {
 		async getAllLists(req, res) {

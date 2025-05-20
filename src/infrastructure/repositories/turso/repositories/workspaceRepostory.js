@@ -1,5 +1,3 @@
-const UPDATEABLE_PROPERTIES = ['name', 'icon_id', 'color'];
-
 export default class WorkspaceRepository {
 	constructor(connection) {
 		this.connection = connection;

@@ -39,8 +39,8 @@ export default function createProjectController(projectRepository) {
 						message: 'El ID del proyecto es requerido',
 					});
 				}
-
 				const project = await getProjectByIdUseCase(id);
+
 				return res.status(200).json({ success: true, data: project });
 			} catch (error) {
 				if (error.message.includes('no encontrado')) {
