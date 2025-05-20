@@ -64,7 +64,8 @@ CREATE TABLE projects (
 
 CREATE TABLE folders (
   id BINARY(16) PRIMARY KEY,
-  project_id BINARY(16) NOT NULL,  
+  project_id BINARY(16) NOT NULL, 
+  workspace_id BINARY(16) NOT NULL, 
   name VARCHAR(255) NOT NULL,
   description TEXT,
   
@@ -101,6 +102,7 @@ CREATE TABLE lists (
 
     parent_id BINARY(16) NOT NULL,
     parent_type ENUM('project', 'folder') NOT NULL,
+    workspace_id BINARY(16) NOT NULL,
 
     created_by BINARY(16),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -132,6 +134,7 @@ CREATE TABLE tasks(
     title TEXT NOT NULL,
 
     list_id BINARY(16) NOT NULL,
+    workspace_id BINARY(16) NOT NULL,
 
     created_by BINARY(16),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -156,6 +159,7 @@ CREATE TABLE subtasks(
     title TEXT NOT NULL,
 
     task_id BINARY(16) NOT NULL,
+    workspace_id BINARY(16) NOT NULL,
 
     start_date DATE,
     end_date DATE,

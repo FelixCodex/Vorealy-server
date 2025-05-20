@@ -11,7 +11,8 @@ export default class ListRepository {
           name, 
           color,
           description, 
-          HEX(parent_id) AS parent_id, 
+          HEX(parent_id) AS parent_id,
+          HEX(workspace_id) AS workspace_id,  
           parent_type, 
           HEX(created_by) AS created_by, 
           created_at, 
@@ -41,6 +42,7 @@ export default class ListRepository {
           color,
           description, 
           HEX(parent_id) AS parent_id, 
+          HEX(workspace_id) AS workspace_id, 
           parent_type, 
           HEX(created_by) AS created_by, 
           created_at, 
@@ -72,6 +74,7 @@ export default class ListRepository {
           color,
           description, 
           HEX(parent_id) AS parent_id, 
+          HEX(workspace_id) AS workspace_id, 
           parent_type, 
           HEX(created_by) AS created_by, 
           created_at, 
@@ -101,6 +104,7 @@ export default class ListRepository {
 		color = '#808080',
 		description = null,
 		parentId,
+		workspaceId,
 		parentType = 'workspace',
 		createdBy,
 		createdAt,
@@ -122,6 +126,7 @@ export default class ListRepository {
           color,
           description, 
           parent_id, 
+		  workspace_id, 
           parent_type, 
           created_by, 
           created_at, 
@@ -138,7 +143,8 @@ export default class ListRepository {
           ?, 
           ?,
           ?, 
-          UNHEX(?), 
+          UNHEX(?),
+		  UNHEX(?), 
           ?, 
           UNHEX(?), 
           ?, 
@@ -156,6 +162,7 @@ export default class ListRepository {
           color,
           description, 
           HEX(parent_id) AS parent_id, 
+          HEX(workspace_id) AS workspace_id, 
           parent_type, 
           HEX(created_by) AS created_by, 
           created_at, 
@@ -173,6 +180,7 @@ export default class ListRepository {
 					color,
 					description,
 					parentId,
+					workspaceId,
 					parentType,
 					createdBy,
 					createdAt,
@@ -252,10 +260,6 @@ export default class ListRepository {
 				updates.push('estimated_time = ?');
 				values.push(estimatedTime);
 			}
-			if (position !== null) {
-				updates.push('position = ?');
-				values.push(position);
-			}
 
 			if (updates.length === 0) {
 				return null; // No hay nada que actualizar
@@ -273,6 +277,7 @@ export default class ListRepository {
            color,
            description, 
            HEX(parent_id) AS parent_id, 
+          HEX(workspace_id) AS workspace_id, 
            parent_type, 
            HEX(created_by) AS created_by, 
            created_at, 
@@ -289,27 +294,6 @@ export default class ListRepository {
 			return rows[0] || null;
 		} catch (err) {
 			console.error('Error en ListRepository.update:', err);
-			throw err;
-		}
-	}
-
-	async updatePositions(positionUpdates) {
-		try {
-			// positionUpdates debe ser un array de objetos { id, position }
-			const promises = positionUpdates.map(item => {
-				return this.connection.execute(
-					`UPDATE lists SET position = ? WHERE id = UNHEX(?);`,
-					[item.position, item.id]
-				);
-			});
-
-			await Promise.all(promises);
-			return {
-				success: true,
-				message: 'Posiciones actualizadas correctamente',
-			};
-		} catch (err) {
-			console.error('Error en ListRepository.updatePositions:', err);
 			throw err;
 		}
 	}

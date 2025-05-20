@@ -1,17 +1,166 @@
-export function AuthController(userRepo) {
+import createTask from '../../use-cases/createTask';
+import deleteTask from '../../use-cases/deleteTask';
+import deleteTasksByListId from '../../use-cases/deleteTasksByListId';
+import getAllTasks from '../../use-cases/getAllTasks';
+import getTaskById from '../../use-cases/getTaskById';
+import getTasksByListId from '../../use-cases/getTasksByListId';
+import updateTask from '../../use-cases/updateTask';
+
+export default function createTaskController(taskRepository) {
+	const getAllTasksUseCase = getAllTasks(taskRepository);
+	const getTaskByIdUseCase = getTaskById(taskRepository);
+	const getTasksByListIdUseCase = getTasksByListId(taskRepository);
+	const createTaskUseCase = createTask(taskRepository);
+	const updateTaskUseCase = updateTask(taskRepository);
+	const deleteTaskUseCase = deleteTask(taskRepository);
+	const deleteTasksByListIdUseCase = deleteTasksByListId(taskRepository);
+
 	return {
-		async login(req, res) {
+		async getAllTasks(req, res) {
 			try {
-				const { remember } = req.body;
-				const token_config = {
-					...TOKEN_CONFIG,
-					maxAge: remember ? t * 50 : t * 2,
-				};
-				const user = await authenticateUseCase(req.body);
-				await asignAccessToken(res, token_config, { id: user.id });
-				res.send(user);
-			} catch (err) {
-				res.status(400).json({ error: err.message });
+				const tasks = await getAllTasksUseCase();
+				return res.status(200).json({ success: true, data: tasks });
+			} catch (error) {
+				return res.status(500).json({
+					success: false,
+					message: error.message || 'Error al obtener tareas',
+				});
+			}
+		},
+
+		async getTaskById(req, res) {
+			try {
+				const { id } = req.params;
+				if (!id) {
+					return res.status(400).json({
+						success: false,
+						message: 'El ID de la tarea es requerido',
+					});
+				}
+
+				const task = await getTaskByIdUseCase(id);
+				return res.status(200).json({ success: true, data: task });
+			} catch (error) {
+				if (error.message.includes('no encontrado')) {
+					return res.status(404).json({
+						success: false,
+						message: error.message,
+					});
+				}
+				return res.status(500).json({
+					success: false,
+					message: error.message || 'Error al obtener tarea',
+				});
+			}
+		},
+
+		async getTasksByListId(req, res) {
+			try {
+				const { listId } = req.params;
+				if (!listId) {
+					return res.status(400).json({
+						success: false,
+						message: 'El ID de la lista es requerido',
+					});
+				}
+
+				const tasks = await getTasksByListIdUseCase(listId);
+				return res.status(200).json({ success: true, data: tasks });
+			} catch (error) {
+				return res.status(500).json({
+					success: false,
+					message: error.message || 'Error al obtener tareas de la lista',
+				});
+			}
+		},
+
+		async createTask(req, res) {
+			try {
+				const taskData = req.body;
+
+				if (req.user && req.user.id) {
+					taskData.createdBy = req.user.id;
+					taskData.updatedBy = req.user.id;
+				}
+
+				const newTask = await createTaskUseCase(taskData);
+				return res.status(201).json({
+					success: true,
+					data: newTask,
+					message: 'Tarea creada exitosamente',
+				});
+			} catch (error) {
+				return res.status(400).json({
+					success: false,
+					message: error.message || 'Error al crear tarea',
+				});
+			}
+		},
+
+		async updateTask(req, res) {
+			try {
+				const { id } = req.params;
+				const taskData = req.body;
+
+				if (req.user && req.user.id) {
+					taskData.updatedBy = req.user.id;
+				}
+
+				const updatedTask = await updateTaskUseCase(id, taskData);
+				return res.status(200).json({
+					success: true,
+					data: updatedTask,
+					message: 'Proyecto actualizado exitosamente',
+				});
+			} catch (error) {
+				if (error.message.includes('no encontrado')) {
+					return res.status(404).json({
+						success: false,
+						message: error.message,
+					});
+				}
+				return res.status(400).json({
+					success: false,
+					message: error.message || 'Error al actualizar tarea',
+				});
+			}
+		},
+
+		async deleteTask(req, res) {
+			try {
+				const { id } = req.params;
+				await deleteTaskUseCase(id);
+				return res.status(200).json({
+					success: true,
+					message: 'Proyecto eliminado exitosamente',
+				});
+			} catch (error) {
+				if (error.message.includes('no encontrado')) {
+					return res.status(404).json({
+						success: false,
+						message: error.message,
+					});
+				}
+				return res.status(400).json({
+					success: false,
+					message: error.message || 'Error al eliminar tarea',
+				});
+			}
+		},
+
+		async deleteTasksByListId(req, res) {
+			try {
+				const { listId } = req.params;
+				await deleteTasksByListIdUseCase(listId);
+				return res.status(200).json({
+					success: true,
+					message: 'Tareas de la lista eliminadas exitosamente',
+				});
+			} catch (error) {
+				return res.status(400).json({
+					success: false,
+					message: error.message || 'Error al eliminar tareas',
+				});
 			}
 		},
 	};

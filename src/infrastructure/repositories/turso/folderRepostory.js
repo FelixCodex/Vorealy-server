@@ -8,7 +8,8 @@ export default class FolderRepository {
 			const { rows } = await this.connection.execute(
 				`SELECT 
           HEX(id) AS id, 
-          HEX(project_id) AS project_id, 
+          HEX(project_id) AS project_id,
+          HEX(workspace_id) AS workspace_id,  
           name, 
           description, 
           color, 
@@ -36,6 +37,7 @@ export default class FolderRepository {
 				`SELECT 
           HEX(id) AS id, 
           HEX(project_id) AS project_id, 
+          HEX(workspace_id) AS workspace_id, 
           name, 
           description, 
           color, 
@@ -65,6 +67,7 @@ export default class FolderRepository {
 				`SELECT 
           HEX(id) AS id, 
           HEX(project_id) AS project_id, 
+          HEX(workspace_id) AS workspace_id, 
           name, 
           description, 
           color, 
@@ -92,6 +95,7 @@ export default class FolderRepository {
 	async create({
 		id,
 		projectId,
+		workspaceId,
 		name,
 		description = null,
 		color = '#808080',
@@ -111,6 +115,7 @@ export default class FolderRepository {
 				`INSERT INTO folders(
           id, 
           project_id, 
+          workspace_id, 
           name, 
           description, 
           color, 
@@ -126,6 +131,7 @@ export default class FolderRepository {
         ) VALUES(
           UNHEX(?), 
           UNHEX(?), 
+		  UNHEX(?),
           ?, 
           ?, 
           ?, 
@@ -141,6 +147,7 @@ export default class FolderRepository {
         ) RETURNING 
           HEX(id) AS id, 
           HEX(project_id) AS project_id, 
+          HEX(workspace_id) AS workspace_id, 
           name, 
           description, 
           color, 
@@ -156,6 +163,7 @@ export default class FolderRepository {
 				[
 					hexId,
 					projectId,
+					workspaceId,
 					name,
 					description,
 					color,
@@ -249,6 +257,7 @@ export default class FolderRepository {
          RETURNING 
            HEX(id) AS id, 
            HEX(project_id) AS project_id, 
+          HEX(workspace_id) AS workspace_id, 
            name, 
            description, 
            color, 
@@ -266,27 +275,6 @@ export default class FolderRepository {
 			return rows[0] || null;
 		} catch (err) {
 			console.error('Error en FolderRepository.update:', err);
-			throw err;
-		}
-	}
-
-	async updatePositions(positionUpdates) {
-		try {
-			// positionUpdates debe ser un array de objetos { id, position }
-			const promises = positionUpdates.map(item => {
-				return this.connection.execute(
-					`UPDATE folders SET position = ? WHERE id = UNHEX(?);`,
-					[item.position, item.id]
-				);
-			});
-
-			await Promise.all(promises);
-			return {
-				success: true,
-				message: 'Posiciones actualizadas correctamente',
-			};
-		} catch (err) {
-			console.error('Error en FolderRepository.updatePositions:', err);
 			throw err;
 		}
 	}
