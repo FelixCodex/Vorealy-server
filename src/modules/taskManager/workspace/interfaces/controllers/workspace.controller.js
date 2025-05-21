@@ -49,7 +49,7 @@ export function createWorkspaceController(workspaceRepo) {
 		async update(req, res) {
 			const userId = req.user.id;
 			const { workspaceId } = req.params;
-			const { name, color, icon } = req.body;
+			const { name, color, icon_id } = req.body;
 
 			try {
 				const updatedWorkspace = await updateWSUseCase({
@@ -57,7 +57,7 @@ export function createWorkspaceController(workspaceRepo) {
 					userId,
 					name,
 					color,
-					icon,
+					icon_id,
 				});
 				if (!updatedWorkspace) {
 					return res.status(500).json({ error: 'Error updating workspace' });

@@ -27,18 +27,15 @@ import { createListRouter } from './routes/list.routes.js';
 import { createTaskRouter } from './routes/task.routes.js';
 import { createSubTaskRouter } from './routes/subtask.routes.js';
 import { createAuthRouter } from './routes/auth.routes.js';
+import { CORS_CONFIG } from './config.js';
+import { createRegisterSocketEvents } from './modules/webSocket/application/socket.events.js';
 
 const app = express();
 
 dotenv.config();
 
 // --- Basic Config
-app.use(
-	cors({
-		origin: ['http://localhost:5173', 'http://localhost:5174'],
-		credentials: true,
-	})
-);
+app.use(cors(CORS_CONFIG));
 app.use(morgan('dev'));
 app.use(express.json());
 app.use(cookieParser());
@@ -76,4 +73,6 @@ app.use('/app/workspace/:workspaceId', createListRouter(ListRepository));
 app.use('/app/workspace/:workspaceId', createTaskRouter(TaskRepository));
 app.use('/app/workspace/:workspaceId', createSubTaskRouter(SubTaskRepository));
 
-export default app;
+const registerSocketEvents = createRegisterSocketEvents({ UserRepository });
+
+export default { app, registerSocketEvents };

@@ -10,6 +10,18 @@ export const DB_CONNECTION_DATA = {
 	password: process.env.MYSQLPASSWORD,
 };
 
+export const CORS_CONFIG = {
+	origin: [
+		'http://localhost:5173',
+		'http://localhost:5174',
+		'https://modelstore.pages.dev',
+		'https://adminmodelstore.pages.dev',
+		'https://javierdavid.org',
+		'https://javier-david.com',
+	],
+	credentials: true,
+};
+
 export const CLIENT_URL = 'https://';
 
 export const SERVER_URL = 'https://';

@@ -59,11 +59,14 @@ export default class WorkspaceRepository {
 		}
 	}
 
-	async update(id, { name = null, icon = null, color = null }) {
+	async update(id, { name = null, icon_id = null, color = null }) {
 		try {
 			const updates = [];
 			const values = [];
 
+			if (!id) {
+				throw new Error('El ID del workspace es requerido');
+			}
 			if (name !== null) {
 				updates.push('name = ?');
 				values.push(name);
@@ -72,9 +75,9 @@ export default class WorkspaceRepository {
 				updates.push('color = ?');
 				values.push(color);
 			}
-			if (icon !== null) {
-				updates.push('icon = ?');
-				values.push(icon);
+			if (icon_id !== null) {
+				updates.push('icon_id = ?');
+				values.push(icon_id);
 			}
 			if (updates.length === 0) {
 				return null; // No hay nada que actualizar

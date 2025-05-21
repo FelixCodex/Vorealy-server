@@ -1,5 +1,5 @@
 export default function updateWorkSpace(workspaceRepository) {
-	return async function ({ id, userId, name, color, icon }) {
+	return async function ({ id, userId, name, color, icon_id }) {
 		if (!id) {
 			return res.status(400).json({ error: 'WorkspaceID required' });
 		}
@@ -17,7 +17,7 @@ export default function updateWorkSpace(workspaceRepository) {
 		const updatedWorkspace = await workspaceRepository.create(id, {
 			name,
 			color,
-			icon,
+			icon_id,
 		});
 
 		return updatedWorkspace;
