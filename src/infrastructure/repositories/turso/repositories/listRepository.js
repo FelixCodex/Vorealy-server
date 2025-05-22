@@ -1,4 +1,6 @@
-export default class ListRepository {
+import { connect } from './connection';
+
+class ListRepositoryClass {
 	constructor(connection) {
 		this.connection = connection;
 	}
@@ -323,3 +325,7 @@ export default class ListRepository {
 		}
 	}
 }
+
+const ListRepository = new ListRepositoryClass(connect());
+
+export default ListRepository;

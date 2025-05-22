@@ -1,4 +1,6 @@
-export default class WorkspaceMemberRepository {
+import { connect } from './connection';
+
+class WorkspaceMemberRepositoryClass {
 	constructor(connection) {
 		this.connection = connection;
 	}
@@ -137,3 +139,6 @@ export default class WorkspaceMemberRepository {
 		}
 	}
 }
+const WorkspaceMemberRepository = new WorkspaceMemberRepositoryClass(connect());
+
+export default WorkspaceMemberRepository;

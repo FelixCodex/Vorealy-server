@@ -16,6 +16,7 @@ import {
 	ListRepository,
 	TaskRepository,
 	SubTaskRepository,
+	connect,
 } from './infrastructure/repositories/turso/index.js';
 import { configureGoogleStrategy } from './modules/auth/infrastructure/services/googlePassportStrategy.js';
 import { createGoogleAuthRouter } from './routes/authGoogle.routes.js';
@@ -29,6 +30,17 @@ import { createSubTaskRouter } from './routes/subtask.routes.js';
 import { createAuthRouter } from './routes/auth.routes.js';
 import { CORS_CONFIG } from './config.js';
 import { createRegisterSocketEvents } from './modules/webSocket/application/socket.events.js';
+
+// --- Repository Connection
+const connection = connect();
+const UserRepository = new UserRepository(connection);
+const WorkspaceRepository = new WorkspaceRepository(connection);
+const WorkspaceMemberRepository = new WorkspaceMemberRepository(connection);
+const ProjectRepository = new ProjectRepository(connection);
+const FolderRepository = new FolderRepository(connection);
+const ListRepository = new ListRepository(connection);
+const TaskRepository = new TaskRepository(connection);
+const SubTaskRepository = new SubTaskRepository(connection);
 
 const app = express();
 

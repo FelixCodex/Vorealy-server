@@ -1,4 +1,6 @@
-export default class ProjectRepository {
+import { connect } from './connection';
+
+class ProjectRepositoryClass {
 	constructor(connection) {
 		this.connection = connection;
 	}
@@ -379,3 +381,5 @@ export default class ProjectRepository {
 		}
 	}
 }
+const ProjectRepository = new ProjectRepositoryClass(connect());
+export default ProjectRepository;

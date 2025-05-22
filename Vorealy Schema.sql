@@ -178,3 +178,57 @@ CREATE TABLE subtasks(
 
 
 
+
+
+
+
+CREATE TABLE custom_property_definitions (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL,
+  type TEXT NOT NULL, 
+  default_value TEXT,
+  options TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+CREATE TABLE custom_property_assignments (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  definition_id INTEGER NOT NULL,
+  entity_type ENUM('workspace', 'project', 'folder', 'list', 'task') NOT NULL, 
+  entity_id BINARY(16) NOT NULL,
+  value TEXT,
+  is_inherited BOOLEAN DEFAULT FALSE,
+  override_parent BOOLEAN DEFAULT FALSE,
+  parent_entity_type TEXT,
+  parent_entity_id BINARY(16),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (definition_id) REFERENCES custom_property_definitions(id) ON DELETE CASCADE,
+  UNIQUE (definition_id, entity_type, entity_id)
+);
+
+
+
+
+
+
+CREATE TABLE change_history (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  entity_type ENUM('workspace', 'project', 'folder', 'list', 'task', 'custom_property') NOT NULL, 
+  entity_id BINARY(16) NOT NULL,
+  change_type ENUM('create', 'update', 'delete') NOT NULL,
+  field_name TEXT, 
+  old_value TEXT, 
+  new_value TEXT, 
+  user_id BINARY(16) NOT NULL, 
+  timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  additional_info TEXT 
+  FOREIGN KEY (user_id) REFERENCES users(id),
+);
+
+-- Índices para mejorar el rendimiento de consultas comunes
+CREATE INDEX idx_change_history_entity ON change_history(entity_type, entity_id);
+CREATE INDEX idx_change_history_user ON change_history(user_id);
+CREATE INDEX idx_change_history_timestamp ON change_history(timestamp);

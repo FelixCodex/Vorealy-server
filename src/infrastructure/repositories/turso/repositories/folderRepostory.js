@@ -1,4 +1,6 @@
-export default class FolderRepository {
+import { connect } from './connection';
+
+class FolderRepositoryClass {
 	constructor(connection) {
 		this.connection = connection;
 	}
@@ -305,3 +307,6 @@ export default class FolderRepository {
 		}
 	}
 }
+const FolderRepository = new FolderRepositoryClass(connect());
+
+export default FolderRepository;

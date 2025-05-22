@@ -1,4 +1,6 @@
-export default class TaskRepository {
+import { connect } from './connection';
+
+class TaskRepositoryClass {
 	constructor(connection) {
 		this.connection = connection;
 	}
@@ -315,3 +317,5 @@ export default class TaskRepository {
 		}
 	}
 }
+const TaskRepository = new TaskRepositoryClass(connect());
+export default TaskRepository;

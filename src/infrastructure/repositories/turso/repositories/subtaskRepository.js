@@ -1,4 +1,6 @@
-export default class SubtaskRepository {
+import { connect } from './connection';
+
+class SubtaskRepositoryClass {
 	constructor(connection) {
 		this.connection = connection;
 	}
@@ -266,3 +268,5 @@ export default class SubtaskRepository {
 		}
 	}
 }
+const SubtaskRepository = new SubtaskRepositoryClass(connect());
+export default SubtaskRepository;

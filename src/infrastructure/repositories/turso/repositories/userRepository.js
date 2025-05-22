@@ -1,9 +1,11 @@
+import { connect } from './connection';
+
 const DEFAUL_PREFERENCES = {
 	language: 'en',
 	notifications: true,
 };
 
-export default class UserRepository {
+class UserRepositoryClass {
 	constructor(connection) {
 		this.connection = connection;
 	}
@@ -83,3 +85,6 @@ function parsePreferences(user) {
 		};
 	}
 }
+
+const UserRepository = new UserRepositoryClass(connect());
+export default UserRepository;
