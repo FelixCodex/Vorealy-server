@@ -1,5 +1,10 @@
 import { Router } from 'express';
 import { AuthController } from '../modules/auth/interfaces/controllers/auth.controller';
+import {
+	LoginSchema,
+	RegisterSchema,
+} from '../modules/auth/infrastructure/schemas/auth.schema';
+import { validateSchema } from '../shared/middlewares/validateSchemaMiddleware';
 
 export const createAuthRouter = Repository => {
 	const router = Router();
@@ -8,10 +13,10 @@ export const createAuthRouter = Repository => {
 
 	router.post(
 		'/register',
-		validateSchema(registerSchema),
+		validateSchema(RegisterSchema),
 		authController.register
 	);
-	router.post('/login', validateSchema(loginSchema), authController.login);
+	router.post('/login', validateSchema(LoginSchema), authController.login);
 	router.get('/logout', authController.logout);
 	router.get('/verify', authRequired, authController.verify);
 

@@ -2,14 +2,6 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-export const DB_CONNECTION_DATA = {
-	host: process.env.MYSQLHOST,
-	user: process.env.MYSQLUSER,
-	port: process.env.MYSQLPORT,
-	database: process.env.MYSQLDATABASE,
-	password: process.env.MYSQLPASSWORD,
-};
-
 export const CORS_CONFIG = {
 	origin: [
 		'http://localhost:5173',
@@ -22,9 +14,9 @@ export const CORS_CONFIG = {
 	credentials: true,
 };
 
-export const CLIENT_URL = 'https://';
+export const CLIENT_URL = process.env.CLIENT_URL;
 
-export const SERVER_URL = 'https://';
+export const SERVER_URL = process.env.SERVER_URL;
 
 export const TURSO_URL = process.env.TURSO_URL;
 export const TURSO_AUTH = process.env.TURSO_AUTH;

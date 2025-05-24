@@ -1,3 +1,7 @@
+import {
+	folderIdParamSchema,
+	projectIdParamSchema,
+} from '../../infrastructure/schemas/folder.schema';
 import createFolder from '../../use-cases/createFolder';
 import deleteFolder from '../../use-cases/deleteFolder';
 import deleteFoldersByProjectId from '../../use-cases/deleteFoldersByProjectId';
@@ -31,7 +35,7 @@ export default function createFolderController(folderRepository) {
 
 		async getFolderById(req, res) {
 			try {
-				const { id } = req.params;
+				const { id } = folderIdParamSchema.parse(req.params);
 				if (!id) {
 					return res.status(400).json({
 						success: false,
@@ -57,7 +61,7 @@ export default function createFolderController(folderRepository) {
 
 		async getFoldersByProjectId(req, res) {
 			try {
-				const { projectId } = req.params;
+				const { projectId } = projectIdParamSchema.parse(req.params);
 				if (!projectId) {
 					return res.status(400).json({
 						success: false,
@@ -133,7 +137,7 @@ export default function createFolderController(folderRepository) {
 
 		async deleteFolder(req, res) {
 			try {
-				const { id } = req.params;
+				const { id } = folderIdParamSchema.parse(req.params);
 				await deleteFolderUseCase(id);
 				return res.status(200).json({
 					success: true,
@@ -155,7 +159,7 @@ export default function createFolderController(folderRepository) {
 
 		async deleteFoldersByProjectId(req, res) {
 			try {
-				const { projectId } = req.params;
+				const { projectId } = projectIdParamSchema.parse(req.params);
 				await deleteFoldersByProjectIdUseCase(projectId);
 				return res.status(200).json({
 					success: true,

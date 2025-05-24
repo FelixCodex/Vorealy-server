@@ -15,7 +15,7 @@ CREATE TABLE workspaces (
 CREATE TABLE workspace_members (
   workspace_id BINARY(16) NOT NULL,
   user_id BINARY(16) NOT NULL,
-  role ENUM('admin', 'member', 'guest') DEFAULT 'member',
+  role ENUM('admin', 'member', 'guest') DEFAULT 'guest',
   joined_at DATETIME NOT NULL,
   invited_by BINARY(16),
   PRIMARY KEY (workspace_id, user_id),
@@ -34,7 +34,7 @@ CREATE TABLE projects (
   color VARCHAR(7) DEFAULT '#4169E1',
   icon VARCHAR(100),
   
-  visibility ENUM('public', 'private', 'workspace') DEFAULT 'workspace',
+  visibility ENUM('public', 'private') DEFAULT 'public',
 
   features_enabled JSON,
   automation_rules JSON,  
@@ -83,7 +83,6 @@ CREATE TABLE folders (
   
   metadata JSON,                      
   
-  /* Constraints */
   FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE,
   FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE RESTRICT,
   FOREIGN KEY (updated_by) REFERENCES users(id) ON DELETE SET NULL
@@ -118,8 +117,6 @@ CREATE TABLE lists (
     is_private BOOLEAN DEFAULT FALSE,
 
     estimated_time INTEGER,
-
-    position INTEGER DEFAULT 0,
 
     FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE RESTRICT,
     FOREIGN KEY (assigned_to) REFERENCES users(id) ON DELETE SET NULL

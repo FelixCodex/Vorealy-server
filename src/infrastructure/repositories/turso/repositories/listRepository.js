@@ -112,7 +112,6 @@ class ListRepositoryClass {
 		createdAt,
 		automationRules = null,
 		assignedTo = null,
-		defaultStates = '[{ "name": "TODO", "color": "#E74C3C" }, { "name": "Done", "color": "#F39C12" }]',
 		statuses = null,
 		priority = 'normal',
 		isPrivate = false,
@@ -120,6 +119,8 @@ class ListRepositoryClass {
 		position = 0,
 	}) {
 		const hexId = id.replace(/-/g, '');
+		const defaultStates =
+			'[{ "name": "ToDo", "color": "#E74C3C" }, { "name": "Done", "color": "#F39C12" }]';
 		try {
 			const { rows } = await this.connection.execute(
 				`INSERT INTO lists(

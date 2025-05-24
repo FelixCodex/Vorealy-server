@@ -4,6 +4,13 @@ import workspacePermissionMiddleware from '../modules/taskManager/workspace/infr
 import workspaceMatchMiddleware from '../modules/taskManager/workspace/infrastructure/workspaceMatch';
 import { createAuthRequiredMiddelware } from '../modules/auth/infrastructure/middelwares/authRequired';
 import { SECRET_JWT_KEY } from '../config';
+import { validateSchema } from '../shared/middlewares/validateSchemaMiddleware';
+import {
+	createProjectInputSchema,
+	CreateProjectSchema,
+	updateProjectInputSchema,
+	UpdateProjectSchema,
+} from '../modules/taskManager/project/infrastructure/schemas/project.schema';
 
 export const createProjectRouter = Repository => {
 	const router = Router();
@@ -34,21 +41,23 @@ export const createProjectRouter = Repository => {
 
 	router.post(
 		'/workspaces/:workspaceId/projects',
+		validateSchema(createProjectInputSchema),
 		workspacePermissionMiddleware(['admin', 'member']),
 		projectController.createProject
+	);
+
+	router.put(
+		'/workspaces/:workspaceId/projects/:id',
+		validateSchema(updateProjectInputSchema),
+		workspacePermissionMiddleware(['admin', 'member']),
+		workspaceMatchMiddleware(Repository),
+		projectController.updateProject
 	);
 
 	router.delete(
 		'/workspaces/:workspaceId/projects',
 		workspacePermissionMiddleware(['admin', 'member']),
 		projectController.deleteProjectsByWorkspaceId
-	);
-
-	router.put(
-		'/workspaces/:workspaceId/projects/:id',
-		workspacePermissionMiddleware(['admin', 'member']),
-		workspaceMatchMiddleware(Repository),
-		projectController.updateProject
 	);
 
 	router.delete(

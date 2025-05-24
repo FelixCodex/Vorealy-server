@@ -4,6 +4,13 @@ import workspacePermissionMiddleware from '../modules/taskManager/workspace/infr
 import workspaceMatchMiddleware from '../modules/taskManager/workspace/infrastructure/workspaceMatch';
 import { createAuthRequiredMiddelware } from '../modules/auth/infrastructure/middelwares/authRequired';
 import { SECRET_JWT_KEY } from '../config';
+import { validateSchema } from '../shared/middlewares/validateSchemaMiddleware';
+import {
+	createListInputSchema,
+	CreateListSchema,
+	updateListInputSchema,
+	UpdateListSchema,
+} from '../modules/taskManager/list/infrastructure/schemas/list.schema';
 
 export const createListRouter = Repository => {
 	const router = Router();
@@ -33,6 +40,7 @@ export const createListRouter = Repository => {
 
 	router.post(
 		'/workspace/:workspaceId/lists',
+		validateSchema(createListInputSchema),
 		workspacePermissionMiddleware(['admin', 'member']),
 		workspaceMatchMiddleware(Repository),
 		listController.createList
@@ -40,6 +48,7 @@ export const createListRouter = Repository => {
 
 	router.put(
 		'/workspaces/:workspaceId/lists/:id',
+		validateSchema(updateListInputSchema),
 		workspacePermissionMiddleware(['admin', 'member']),
 		workspaceMatchMiddleware(Repository),
 		listController.updateList

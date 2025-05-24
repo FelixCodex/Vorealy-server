@@ -1,3 +1,8 @@
+import {
+	listIdParamSchema,
+	listParentParamsSchema,
+	workspaceIdParamSchema,
+} from '../../infrastructure/schemas/list.schema';
 import createList from '../../use-cases/createList';
 import deleteList from '../../use-cases/deleteList';
 import deleteListsByParent from '../../use-cases/deleteListsByParent';
@@ -30,7 +35,7 @@ export default function createListController(listRepository) {
 
 		async getListById(req, res) {
 			try {
-				const { id } = req.params;
+				const { id } = listIdParamSchema.parse(req.params);
 				if (!id) {
 					return res.status(400).json({
 						success: false,
@@ -56,7 +61,9 @@ export default function createListController(listRepository) {
 
 		async getListsByParent(req, res) {
 			try {
-				const { parentId, parentType } = req.params;
+				const { parentId, parentType } = listParentParamsSchema.parse(
+					req.params
+				);
 
 				if (!parentId || !parentType) {
 					return res.status(400).json({
@@ -78,7 +85,7 @@ export default function createListController(listRepository) {
 		async createList(req, res) {
 			try {
 				const listData = req.body;
-				const { workspaceId } = req.params;
+				const { workspaceId } = workspaceIdParamSchema.parse(req.params);
 
 				if (req.user && req.user.id) {
 					listData.createdBy = req.user.id;
@@ -125,7 +132,7 @@ export default function createListController(listRepository) {
 
 		async deleteList(req, res) {
 			try {
-				const { id } = req.params;
+				const { id } = listIdParamSchema.parse(req.params);
 				await deleteListUseCase(id);
 				return res.status(200).json({
 					success: true,
@@ -147,7 +154,9 @@ export default function createListController(listRepository) {
 
 		async deleteListsByParent(req, res) {
 			try {
-				const { parentId, parentType } = req.params;
+				const { parentId, parentType } = listParentParamsSchema.parse(
+					req.params
+				);
 
 				if (!parentId || !parentType) {
 					return res.status(400).json({

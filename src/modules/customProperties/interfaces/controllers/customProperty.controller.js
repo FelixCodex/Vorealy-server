@@ -12,7 +12,7 @@ export function createCustomPropertyController(Repository) {
 			try {
 				const { name, type, defaultValue, options } = req.body;
 
-				const result = await createCustomPropertyUseCase.execute(
+				const result = await createCustomPropertyUseCase(
 					name,
 					type,
 					defaultValue,
@@ -30,7 +30,7 @@ export function createCustomPropertyController(Repository) {
 				const { definitionId, entityType, entityId, value, overrideParent } =
 					req.body;
 
-				const result = await assignCustomPropertyUseCase.execute(
+				const result = await assignCustomPropertyUseCase(
 					definitionId,
 					entityType,
 					entityId,

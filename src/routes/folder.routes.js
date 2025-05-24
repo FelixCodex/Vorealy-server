@@ -4,6 +4,11 @@ import workspacePermissionMiddleware from '../modules/taskManager/workspace/infr
 import workspaceMatchMiddleware from '../modules/taskManager/workspace/infrastructure/workspaceMatch';
 import { createAuthRequiredMiddelware } from '../modules/auth/infrastructure/middelwares/authRequired';
 import { SECRET_JWT_KEY } from '../config';
+import { validateSchema } from '../shared/middlewares/validateSchemaMiddleware';
+import {
+	createFolderInputSchema,
+	updateFolderInputSchema,
+} from '../modules/taskManager/folder/infrastructure/schemas/folder.schema';
 
 export const createFolderRouter = Repository => {
 	const router = Router();
@@ -36,12 +41,14 @@ export const createFolderRouter = Repository => {
 
 	router.post(
 		'/workspace/:workspaceId/folders',
+		validateSchema(createFolderInputSchema),
 		workspacePermissionMiddleware(['admin', 'member']),
 		folderController.createFolder
 	);
 
 	router.put(
 		'/workspace/:workspaceId/folders/:id',
+		validateSchema(updateFolderInputSchema),
 		workspacePermissionMiddleware(['admin', 'member']),
 		workspaceMatchMiddleware(Repository),
 		folderController.updateFolder

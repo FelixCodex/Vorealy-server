@@ -115,7 +115,7 @@ class ProjectRepositoryClass {
 		description = null,
 		color = '#4169E1',
 		icon = null,
-		visibility = 'workspace',
+		visibility = 'public',
 		featuresEnabled = null,
 		automationRules = null,
 		createdAt,

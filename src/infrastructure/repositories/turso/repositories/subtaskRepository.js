@@ -213,10 +213,10 @@ class SubtaskRepositoryClass {
 			}
 
 			if (updates.length === 0) {
-				return null; // No hay nada que actualizar
+				return null;
 			}
 
-			values.push(id); // Para la condición WHERE id = UNHEX(?)
+			values.push(id);
 
 			const { rows } = await this.connection.execute(
 				`UPDATE subtasks 

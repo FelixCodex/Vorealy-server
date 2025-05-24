@@ -1,3 +1,7 @@
+import {
+	getEntityHistoryParamsSchema,
+	getUserActivityParamsSchema,
+} from '../../infrastructure/schemas/changeHistory.schema';
 import { getEntityHistory } from '../../use-cases/getEntityHistory';
 import { getUserActivityHistory } from '../../use-cases/getUserActivityHistory';
 
@@ -8,7 +12,9 @@ export function createChangeHistoryController(Repository) {
 	return {
 		async getEntityHistory(req, res) {
 			try {
-				const { entityType, entityId } = req.params;
+				const { entityType, entityId } = getEntityHistoryParamsSchema.parse(
+					req.params
+				);
 				const { limit, offset, sortDirection } = req.query;
 
 				const options = {
@@ -31,7 +37,7 @@ export function createChangeHistoryController(Repository) {
 
 		async getUserActivity(req, res) {
 			try {
-				const { userId } = req.params;
+				const { userId } = getUserActivityParamsSchema.parse(req.params);
 				const { limit, offset, entityTypes } = req.query;
 
 				const options = {
