@@ -6,15 +6,41 @@ export default function createSubTask(subtaskRepository) {
 					'El nombre de la subtarea y el ID del workspace son obligatorios'
 				);
 			}
-
-			if (!subTaskData.createdAt) {
-				subTaskData.createdAt = new Date().toISOString();
-			}
-			if (!subTaskData.updatedAt) {
-				subTaskData.updatedAt = subTaskData.createdAt;
+			if (!['low', 'normal', 'high', 'urgent'].includes(taskData.priority)) {
+				throw new Error('La prioridad de la tarea no es valida');
 			}
 
-			return await subtaskRepository.create(subTaskData);
+			const now = new Date().toISOString();
+
+			const {
+				title,
+				task_id,
+				workspace_id,
+				completed,
+				created_by,
+				start_date,
+				end_date,
+				assigned_to,
+				priority,
+				estimated_time,
+			} = subTaskData;
+
+			const subtask = new SubTask(
+				title,
+				task_id,
+				workspace_id,
+				completed,
+				created_by,
+				now,
+				now,
+				start_date,
+				end_date,
+				assigned_to,
+				priority,
+				estimated_time
+			);
+
+			return await subtaskRepository.create(subtask);
 		} catch (error) {
 			throw new Error(`Error al crear tarea: ${error.message}`);
 		}

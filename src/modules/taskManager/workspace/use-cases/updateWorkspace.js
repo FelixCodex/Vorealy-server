@@ -14,7 +14,7 @@ export default function updateWorkSpace(workspaceRepository) {
 			return res.status(403).json({ error: 'User is not owner' });
 		}
 
-		const updatedWorkspace = await workspaceRepository.create(id, {
+		const updatedWorkspace = await workspaceRepository.update(id, {
 			name,
 			color,
 			icon_id,

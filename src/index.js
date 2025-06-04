@@ -1,4 +1,4 @@
-import { app, registerSocketEvents } from './app.js';
+import { app, registerSocketEvents } from './app.config.js';
 import http from 'node:http';
 import { initSocket } from './socket.io.js';
 

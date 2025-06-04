@@ -105,6 +105,7 @@ CREATE TABLE lists (
 
     created_by BINARY(16),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
     automation_rules JSON,
 
@@ -135,6 +136,7 @@ CREATE TABLE tasks(
 
     created_by BINARY(16),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
     start_date DATE,
     end_date DATE,
@@ -159,6 +161,10 @@ CREATE TABLE subtasks(
     workspace_id BINARY(16) NOT NULL,
 
     completed BOOLEAN DEFAULT false,
+
+    created_by BINARY(16),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
     start_date DATE,
     end_date DATE,
@@ -229,3 +235,59 @@ CREATE TABLE change_history (
 CREATE INDEX idx_change_history_entity ON change_history(entity_type, entity_id);
 CREATE INDEX idx_change_history_user ON change_history(user_id);
 CREATE INDEX idx_change_history_timestamp ON change_history(timestamp);
+
+
+
+
+
+
+CREATE TABLE documents (
+  id BINARY(16) PRIMARY KEY,
+  title TEXT NOT NULL,
+  content TEXT DEFAULT '',
+    workspace_id BINARY(16) NOT NULL,
+  parent_type ENUM('project', 'folder', 'list') NOT NULL,
+  parent_id BINARY(16),
+  created_by BINARY(16),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  version INTEGER DEFAULT 1,
+  is_deleted BOOLEAN DEFAULT FALSE,
+  FOREIGN KEY (created_by) REFERENCES users(id)
+);
+
+
+CREATE TABLE IF NOT EXISTS forms (
+  id BINARY(16) PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  description TEXT,
+  elements JSON NOT NULL,
+  is_active BOOLEAN DEFAULT TRUE,
+  workspace_id BINARY(16) NOT NULL,
+  project_id VARCHAR(255),
+  created_by BINARY(16) NOT NULL,
+  created_at DATETIME NOT NULL,
+  updated_at DATETIME NOT NULL,
+  version INT DEFAULT 1,
+  INDEX idx_forms_workspace_id (workspace_id),
+  INDEX idx_forms_project_id (project_id),
+  INDEX idx_forms_created_by (created_by),
+  INDEX idx_forms_is_active (is_active),
+  FOREIGN KEY (created_by) REFERENCES users(id),
+  FOREIGN KEY (workspace_id) REFERENCES workspaces(id)
+);
+
+CREATE TABLE IF NOT EXISTS form_submissions (
+  id BINARY(16) PRIMARY KEY,
+  form_id BINARY(16) NOT NULL,
+  data JSON NOT NULL,
+  submitted_by BINARY(16) NOT NULL,
+  submitted_at DATETIME NOT NULL,
+  status ENUM('submitted', 'reviewed', 'approved', 'rejected') DEFAULT 'submitted',
+  INDEX idx_form_submissions_form_id (form_id),
+  INDEX idx_form_submissions_submitted_by (submitted_by),
+  INDEX idx_form_submissions_status (status),
+  INDEX idx_form_submissions_submitted_at (submitted_at),
+  FOREIGN KEY (form_id) REFERENCES forms(id) ON DELETE CASCADE,
+  FOREIGN KEY (submitted_by) REFERENCES users(id)
+);

@@ -4,12 +4,16 @@ export function createCustomProperty(customPropertyRepository) {
 			throw new Error('El nombre de la propiedad y el tipo son obligatorios');
 		}
 		try {
-			return await customPropertyRepository.createPropertyDefinition({
+			const propertyDefinition = new CustomPropertyDefinition(
+				null,
 				name,
 				type,
 				defaultValue,
-				options,
-			});
+				options
+			);
+			return await customPropertyRepository.createPropertyDefinition(
+				propertyDefinition
+			);
 		} catch (error) {
 			throw new Error(`Error al crear propiedad: ${error.message}`);
 		}

@@ -7,9 +7,7 @@ import { SECRET_JWT_KEY } from '../config';
 import { validateSchema } from '../shared/middlewares/validateSchemaMiddleware';
 import {
 	createListInputSchema,
-	CreateListSchema,
 	updateListInputSchema,
-	UpdateListSchema,
 } from '../modules/taskManager/list/infrastructure/schemas/list.schema';
 
 export const createListRouter = Repository => {
@@ -33,7 +31,7 @@ export const createListRouter = Repository => {
 		workspaceMatchMiddleware(
 			Repository,
 			['parentId', 'parentType'],
-			'getByParentId'
+			'getByParent'
 		),
 		listController.getListsByParent
 	);
@@ -42,7 +40,6 @@ export const createListRouter = Repository => {
 		'/workspace/:workspaceId/lists',
 		validateSchema(createListInputSchema),
 		workspacePermissionMiddleware(['admin', 'member']),
-		workspaceMatchMiddleware(Repository),
 		listController.createList
 	);
 

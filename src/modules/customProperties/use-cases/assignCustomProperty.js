@@ -19,16 +19,17 @@ export function assignCustomProperty(customPropertyRepository) {
 		}
 
 		try {
-			const assignment = {
+			const assignment = new CustomPropertyAssignment(
+				null,
 				definitionId,
 				entityType,
 				entityId,
 				value,
-				isInherited: false,
+				false,
 				overrideParent,
-				parentEntityType: null,
-				parentEntityId: null,
-			};
+				null,
+				null
+			);
 			return customPropertyRepository.assignProperty(assignment);
 		} catch (error) {
 			throw new Error(

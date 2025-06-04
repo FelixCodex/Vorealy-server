@@ -14,6 +14,9 @@ class SubtaskRepositoryClass {
                     HEX(task_id) AS task_id, 
           			HEX(workspace_id) AS workspace_id, 
 					completed,
+					created_by,
+					created_at,
+					updated_at,
                     start_date, 
                     end_date, 
                     HEX(assigned_to) AS assigned_to, 
@@ -37,6 +40,9 @@ class SubtaskRepositoryClass {
                     HEX(task_id) AS task_id, 
           			HEX(workspace_id) AS workspace_id, 
 					completed,
+					created_by,
+					created_at,
+					updated_at,
                     start_date, 
                     end_date, 
                     HEX(assigned_to) AS assigned_to, 
@@ -62,6 +68,9 @@ class SubtaskRepositoryClass {
                     HEX(task_id) AS task_id, 
           			HEX(workspace_id) AS workspace_id, 
 					completed,
+					created_by,
+					created_at,
+					updated_at,
                     start_date, 
                     end_date, 
                     HEX(assigned_to) AS assigned_to, 
@@ -87,6 +96,9 @@ class SubtaskRepositoryClass {
                     HEX(task_id) AS task_id, 
           			HEX(workspace_id) AS workspace_id, 
 					completed,
+					created_by,
+					created_at,
+					updated_at,
                     start_date, 
                     end_date, 
                     HEX(assigned_to) AS assigned_to, 
@@ -108,6 +120,9 @@ class SubtaskRepositoryClass {
 		title,
 		taskId,
 		workspaceId,
+		createdBy,
+		createdAt,
+		updatedAt,
 		startDate = null,
 		endDate = null,
 		assignedTo = null,
@@ -122,6 +137,9 @@ class SubtaskRepositoryClass {
                     title, 
                     task_id, 
            		 	workspace_id, 
+					created_by,
+					created_at,
+					updated_at,
                     start_date, 
                     end_date, 
                     assigned_to, 
@@ -132,7 +150,10 @@ class SubtaskRepositoryClass {
                     UNHEX(?), 
                     ?, 
                     UNHEX(?), 
-					UNHEX(?)
+					UNHEX(?),
+					UNHEX(?),
+					?,
+					?,
                     ?, 
                     ?, 
                     UNHEX(?), 
@@ -144,6 +165,10 @@ class SubtaskRepositoryClass {
                     title, 
                     HEX(task_id) AS task_id, 
           			HEX(workspace_id) AS workspace_id, 
+					completed,
+					created_by,
+					created_at,
+					updated_at,
                     start_date, 
                     end_date, 
                     HEX(assigned_to) AS assigned_to, 
@@ -154,6 +179,9 @@ class SubtaskRepositoryClass {
 					title,
 					taskId,
 					workspaceId,
+					createdBy,
+					createdAt,
+					updatedAt,
 					startDate,
 					endDate,
 					assignedTo,
@@ -215,6 +243,10 @@ class SubtaskRepositoryClass {
 			if (updates.length === 0) {
 				return null;
 			}
+			const now = new Date().toISOString();
+
+			updates.push('updated_at = ?');
+			values.push(now);
 
 			values.push(id);
 
@@ -228,6 +260,9 @@ class SubtaskRepositoryClass {
                     HEX(task_id) AS task_id,
           			HEX(workspace_id) AS workspace_id,  
 					completed,
+					created_by,
+					created_at,
+					updated_at,
                     start_date, 
                     end_date, 
                     HEX(assigned_to) AS assigned_to, 

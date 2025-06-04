@@ -11,13 +11,14 @@ export default function addWorkspaceMember(workspaceMemberRepository) {
 			}
 
 			const joinedAt = new Date().toISOString();
-			return await workspaceMemberRepository.addMember({
+			const wokspaceMember = new WorkspaceMember(
 				workspaceId,
 				userId,
 				role,
 				joinedAt,
-				invitedBy,
-			});
+				invitedBy
+			);
+			return await workspaceMemberRepository.addMember(wokspaceMember);
 		} catch (error) {
 			throw new Error(`Error al añadir miembro al workspace: ${error.message}`);
 		}

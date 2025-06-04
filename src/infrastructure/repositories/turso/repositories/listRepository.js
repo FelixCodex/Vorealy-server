@@ -18,6 +18,7 @@ class ListRepositoryClass {
           parent_type, 
           HEX(created_by) AS created_by, 
           created_at, 
+          updated_at, 
           automation_rules, 
           HEX(assigned_to) AS assigned_to, 
           default_states, 
@@ -48,6 +49,7 @@ class ListRepositoryClass {
           parent_type, 
           HEX(created_by) AS created_by, 
           created_at, 
+          updated_at, 
           automation_rules, 
           HEX(assigned_to) AS assigned_to, 
           default_states, 
@@ -80,6 +82,7 @@ class ListRepositoryClass {
           parent_type, 
           HEX(created_by) AS created_by, 
           created_at, 
+          updated_at, 
           automation_rules, 
           HEX(assigned_to) AS assigned_to, 
           default_states, 
@@ -110,13 +113,13 @@ class ListRepositoryClass {
 		parentType = 'workspace',
 		createdBy,
 		createdAt,
+		updatedAt,
 		automationRules = null,
 		assignedTo = null,
 		statuses = null,
 		priority = 'normal',
 		isPrivate = false,
 		estimatedTime = null,
-		position = 0,
 	}) {
 		const hexId = id.replace(/-/g, '');
 		const defaultStates =
@@ -133,6 +136,7 @@ class ListRepositoryClass {
           parent_type, 
           created_by, 
           created_at, 
+          updated_at, 
           automation_rules, 
           assigned_to, 
           default_states, 
@@ -152,8 +156,8 @@ class ListRepositoryClass {
           UNHEX(?), 
           ?, 
           ?, 
+		  ?,
           UNHEX(?), 
-          ?, 
           ?, 
           ?, 
           ?, 
@@ -169,14 +173,14 @@ class ListRepositoryClass {
           parent_type, 
           HEX(created_by) AS created_by, 
           created_at, 
+          updated_at, 
           automation_rules, 
           HEX(assigned_to) AS assigned_to, 
           default_states, 
           statuses, 
           priority, 
           is_private, 
-          estimated_time, 
-          position;`,
+          estimated_time;`,
 				[
 					hexId,
 					name,
@@ -187,6 +191,7 @@ class ListRepositoryClass {
 					parentType,
 					createdBy,
 					createdAt,
+					updatedAt,
 					JSON.stringify(automationRules),
 					assignedTo,
 					defaultStates,
@@ -194,7 +199,6 @@ class ListRepositoryClass {
 					priority,
 					isPrivate,
 					estimatedTime,
-					position,
 				]
 			);
 			return rows[0];
@@ -216,7 +220,6 @@ class ListRepositoryClass {
 		priority = null,
 		isPrivate = null,
 		estimatedTime = null,
-		position = null,
 	}) {
 		try {
 			// Construir la consulta SQL dinámicamente
@@ -267,6 +270,10 @@ class ListRepositoryClass {
 			if (updates.length === 0) {
 				return null; // No hay nada que actualizar
 			}
+			const now = new Date().toISOString();
+
+			updates.push('updated_at = ?');
+			values.push(now);
 
 			values.push(id); // Para la condición WHERE id = UNHEX(?)
 
@@ -284,15 +291,52 @@ class ListRepositoryClass {
            parent_type, 
            HEX(created_by) AS created_by, 
            created_at, 
+           updated_at, 
            automation_rules, 
            HEX(assigned_to) AS assigned_to, 
            default_states, 
            statuses, 
            priority, 
            is_private, 
-           estimated_time, 
-           position;`,
+           estimated_time;`,
 				values
+			);
+			return rows[0] || null;
+		} catch (err) {
+			console.error('Error en ListRepository.update:', err);
+			throw err;
+		}
+	}
+
+	async changeParent({ id, parentId, parentType }) {
+		try {
+			if (['project', 'folder'].includes(parentType)) {
+			}
+
+			const now = new Date().toISOString();
+			const { rows } = await this.connection.execute(
+				`UPDATE lists 
+         SET parent_id = ?, parent_type = ?, updated_at = ?
+         WHERE id = UNHEX(?) 
+         RETURNING 
+           HEX(id) AS id, 
+           name, 
+           color,
+           description, 
+           HEX(parent_id) AS parent_id, 
+          HEX(workspace_id) AS workspace_id, 
+           parent_type, 
+           HEX(created_by) AS created_by, 
+           created_at, 
+           updated_at, 
+           automation_rules, 
+           HEX(assigned_to) AS assigned_to, 
+           default_states, 
+           statuses, 
+           priority, 
+           is_private, 
+           estimated_time;`,
+				[parentId, parentType, now, id]
 			);
 			return rows[0] || null;
 		} catch (err) {

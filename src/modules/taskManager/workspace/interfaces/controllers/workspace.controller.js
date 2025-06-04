@@ -33,7 +33,7 @@ export function createWorkspaceController(workspaceRepo) {
 			try {
 				const { userId } = req.params;
 				const workspaces = await getUserWSUseCase(userId);
-				return res.status(200).json(workspaces);
+				return res.status(200).json({ success: true, data: workspaces });
 			} catch (error) {
 				console.error(
 					'Error en WorkspaceMemberController.getUserWorkspaces:',

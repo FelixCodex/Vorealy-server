@@ -1,3 +1,4 @@
+import crypto from 'node:crypto';
 export default function createList(listRepository) {
 	return async function (listData) {
 		try {
@@ -13,11 +14,29 @@ export default function createList(listRepository) {
 				);
 			}
 
-			if (!listData.createdAt) {
-				listData.createdAt = new Date().toISOString();
-			}
+			const now = new Date().toISOString();
 
-			return await listRepository.create(listData);
+			const list = new List(
+				crypto.randomUUID(),
+				listData.name,
+				listData.color,
+				listData.description,
+				listData.parent_id,
+				listData.parent_type,
+				listData.workspace_id,
+				listData.created_by,
+				now,
+				now,
+				listData.automation_rules,
+				listData.assigned_to,
+				listData.default_states,
+				listData.statuses,
+				listData.priority,
+				listData.is_private,
+				listData.estimated_time
+			);
+
+			return await listRepository.create(list);
 		} catch (error) {
 			throw new Error(`Error al crear lista: ${error.message}`);
 		}

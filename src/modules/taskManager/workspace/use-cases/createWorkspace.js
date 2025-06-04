@@ -22,13 +22,13 @@ export default function createWorkSpace(workspaceRepository) {
 
 		const now = new Date().toISOString();
 
-		const workspace = {
-			id: crypto.randomUUID(),
-			name: name.trim(),
-			owner_id: userId,
-			icon_id: icon,
-			created_at: now,
-		};
+		const workspace = new Workspace(
+			crypto.randomUUID(),
+			name.trim(),
+			userId,
+			icon,
+			now
+		);
 		const createdWorkspace = await workspaceRepository.create(workspace);
 		return createdWorkspace;
 	};

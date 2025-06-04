@@ -1,3 +1,4 @@
+import crypto from 'node:crypto';
 export default function createProject(projectRepository) {
 	return async function (projectData) {
 		try {
@@ -14,7 +15,51 @@ export default function createProject(projectRepository) {
 				projectData.updatedAt = projectData.createdAt;
 			}
 
-			return await projectRepository.create(projectData);
+			const now = new Date().toISOString();
+			const {
+				workspace_id,
+				name,
+				description,
+				color,
+				icon,
+				visibility = 'public',
+				features_enabled,
+				automation_rules,
+				created_by,
+				updated_by,
+				completed_at,
+				estimated_hours,
+				working_days,
+				working_hours,
+				holidays,
+				tags,
+				metadata,
+			} = projectData;
+
+			const project = new Project(
+				crypto.randomUUID(),
+				workspace_id,
+				name,
+				description,
+				color,
+				icon,
+				visibility,
+				features_enabled,
+				automation_rules,
+				now,
+				created_by,
+				now,
+				updated_by,
+				completed_at,
+				estimated_hours,
+				working_days,
+				working_hours,
+				holidays,
+				tags,
+				metadata
+			);
+
+			return await projectRepository.create(project);
 		} catch (error) {
 			throw new Error(`Error al crear proyecto: ${error.message}`);
 		}

@@ -40,6 +40,7 @@ class TaskRepositoryClass {
           HEX(workspace_id) AS workspace_id, 
           HEX(created_by) AS created_by, 
           created_at, 
+          updated_at, 
           start_date, 
           end_date, 
           HEX(assigned_to) AS assigned_to, 
@@ -67,6 +68,7 @@ class TaskRepositoryClass {
           HEX(workspace_id) AS workspace_id, 
           HEX(created_by) AS created_by, 
           created_at, 
+          updated_at, 
           start_date, 
           end_date, 
           HEX(assigned_to) AS assigned_to, 
@@ -94,6 +96,7 @@ class TaskRepositoryClass {
           HEX(workspace_id) AS workspace_id, 
           HEX(created_by) AS created_by, 
           created_at, 
+          updated_at, 
           start_date, 
           end_date, 
           HEX(assigned_to) AS assigned_to, 
@@ -118,6 +121,7 @@ class TaskRepositoryClass {
 		listId,
 		createdBy,
 		createdAt,
+		updatedAt,
 		startDate = null,
 		endDate = null,
 		assignedTo = null,
@@ -135,6 +139,7 @@ class TaskRepositoryClass {
           workspace_id, 
           created_by, 
           created_at, 
+          updated_at, 
           start_date, 
           end_date, 
           assigned_to, 
@@ -148,6 +153,7 @@ class TaskRepositoryClass {
 		  UNHEX(?)
           UNHEX(?), 
           ?, 
+		  ?,
           ?, 
           ?, 
           UNHEX(?), 
@@ -160,6 +166,7 @@ class TaskRepositoryClass {
           HEX(list_id) AS list_id, 
           HEX(created_by) AS created_by, 
           created_at, 
+          updated_at, 
           start_date, 
           end_date, 
           HEX(assigned_to) AS assigned_to, 
@@ -235,6 +242,10 @@ class TaskRepositoryClass {
 			if (updates.length === 0) {
 				return null; // No hay nada que actualizar
 			}
+			const now = new Date().toISOString();
+
+			updates.push('updated_at = ?');
+			values.push(now);
 
 			values.push(id); // Para la condición WHERE id = UNHEX(?)
 
@@ -249,6 +260,7 @@ class TaskRepositoryClass {
           HEX(workspace_id) AS workspace_id, 
            HEX(created_by) AS created_by, 
            created_at, 
+          updated_at, 
            start_date, 
            end_date, 
            HEX(assigned_to) AS assigned_to, 
@@ -277,6 +289,7 @@ class TaskRepositoryClass {
           HEX(workspace_id) AS workspace_id, 
            HEX(created_by) AS created_by, 
            created_at, 
+           updated_at, 
            start_date, 
            end_date, 
            HEX(assigned_to) AS assigned_to, 

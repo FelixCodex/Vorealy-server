@@ -35,7 +35,8 @@ export function recordChange(changeHistoryRepository) {
 			throw new Error('El ID del usuario es obligatorio');
 		}
 		try {
-			return changeHistoryRepository.recordChange({
+			const changeRecord = new ChangeRecord(
+				null,
 				entityType,
 				entityId,
 				changeType,
@@ -43,9 +44,10 @@ export function recordChange(changeHistoryRepository) {
 				oldValue,
 				newValue,
 				userId,
-				timestamp: new Date(),
-				additionalInfo,
-			});
+				new Date(),
+				additionalInfo
+			);
+			return changeHistoryRepository.recordChange(changeRecord);
 		} catch (error) {
 			throw new Error(`Error al crear un registro: ${error.message}`);
 		}
