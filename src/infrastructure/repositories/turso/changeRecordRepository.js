@@ -1,4 +1,6 @@
-class ChangeHistoryRepository {
+import { connect } from './connection.js';
+
+class ChangeHistoryRepositoryClass {
 	constructor(connection) {
 		this.connection = connection;
 	}
@@ -171,3 +173,8 @@ class ChangeHistoryRepository {
 			.filter(Boolean);
 	}
 }
+
+const ChangeHistoryRepository = new ChangeHistoryRepositoryClass(
+	await connect()
+);
+export default ChangeHistoryRepository;

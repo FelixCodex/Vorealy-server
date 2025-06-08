@@ -1,11 +1,11 @@
 import {
 	getEntityHistoryParamsSchema,
 	getUserActivityParamsSchema,
-} from '../../infrastructure/schemas/changeHistory.schema';
-import { getEntityHistory } from '../../use-cases/getEntityHistory';
-import { getUserActivityHistory } from '../../use-cases/getUserActivityHistory';
+} from '../../infrastructure/schemas/changeHistory.schema.js';
+import { getEntityHistory } from '../../use-cases/getEntityHistory.js';
+import { getUserActivityHistory } from '../../use-cases/getUserActivityHistory.js';
 
-export function createChangeHistoryController(Repository) {
+export default function createChangeHistoryController(Repository) {
 	const getEntityHistoryUseCase = getEntityHistory(Repository);
 	const getUserActivityHistoryUseCase = getUserActivityHistory(Repository);
 

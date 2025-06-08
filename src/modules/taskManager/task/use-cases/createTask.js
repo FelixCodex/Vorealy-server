@@ -1,4 +1,6 @@
 import crypto from 'node:crypto';
+import { getDateNow } from '../../../../shared/utils/utils.js';
+import { List } from '../domain/entity/Task.js';
 export default function createTask(taskRepository) {
 	return async function (taskData) {
 		try {
@@ -11,34 +13,22 @@ export default function createTask(taskRepository) {
 				throw new Error('La prioridad de la tarea no es valida');
 			}
 
-			const now = new Date().toISOString();
-			const {
-				title,
-				list_id,
-				workspace_id,
-				created_by,
-				start_date,
-				end_date,
-				assigned_to,
-				state,
-				priority,
-				estimated_time,
-			} = taskData;
+			const now = getDateNow();
 
 			const list = new List(
 				crypto.randomUUID(),
-				title,
-				list_id,
-				workspace_id,
-				created_by,
+				taskData.title,
+				taskData.list_id,
+				taskData.workspace_id,
+				taskData.created_by,
 				now,
 				now,
-				start_date,
-				end_date,
-				assigned_to,
-				state,
-				priority,
-				estimated_time
+				taskData.start_date,
+				taskData.end_date,
+				taskData.assigned_to,
+				taskData.state,
+				taskData.priority,
+				taskData.estimated_time
 			);
 
 			return await taskRepository.create(list);

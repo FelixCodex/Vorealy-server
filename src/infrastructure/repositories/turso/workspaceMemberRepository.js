@@ -1,4 +1,4 @@
-import { connect } from './connection';
+import { connect } from './connection.js';
 
 class WorkspaceMemberRepositoryClass {
 	constructor(connection) {
@@ -61,7 +61,7 @@ class WorkspaceMemberRepositoryClass {
         WHERE workspace_id = UNHEX(?) AND user_id = UNHEX(?);`,
 				[workspaceId, userId]
 			);
-			return rows[0] || null;
+			return rows[0];
 		} catch (err) {
 			console.error('Error en WorkspaceMemberRepository.getMember:', err);
 			throw err;
@@ -71,10 +71,17 @@ class WorkspaceMemberRepositoryClass {
 	async addMember({
 		workspaceId,
 		userId,
-		role = 'member',
+		role = 'guest',
 		joinedAt,
 		invitedBy,
 	}) {
+		console.log({
+			workspaceId,
+			userId,
+			role,
+			joinedAt,
+			invitedBy,
+		});
 		try {
 			const { rows } = await this.connection.execute(
 				`INSERT INTO workspace_members(workspace_id, user_id, role, joined_at, invited_by) 
@@ -98,7 +105,7 @@ class WorkspaceMemberRepositoryClass {
          RETURNING HEX(workspace_id) AS workspace_id, HEX(user_id) AS user_id, role, joined_at, HEX(invited_by) AS invited_by;`,
 				[role, workspaceId, userId]
 			);
-			return rows[0] || null;
+			return rows[0];
 		} catch (err) {
 			console.error('Error en WorkspaceMemberRepository.updateRole:', err);
 			throw err;
@@ -112,7 +119,7 @@ class WorkspaceMemberRepositoryClass {
          WHERE workspace_id = UNHEX(?) AND user_id = UNHEX(?);`,
 				[workspaceId, userId]
 			);
-			return { success: true, message: 'Miembro eliminado correctamente' };
+			return true;
 		} catch (err) {
 			console.error('Error en WorkspaceMemberRepository.removeMember:', err);
 			throw err;
@@ -126,10 +133,7 @@ class WorkspaceMemberRepositoryClass {
          WHERE workspace_id = UNHEX(?);`,
 				[workspaceId]
 			);
-			return {
-				success: true,
-				message: 'Todos los miembros eliminados correctamente',
-			};
+			return true;
 		} catch (err) {
 			console.error(
 				'Error en WorkspaceMemberRepository.removeAllMembers:',
@@ -139,6 +143,8 @@ class WorkspaceMemberRepositoryClass {
 		}
 	}
 }
-const WorkspaceMemberRepository = new WorkspaceMemberRepositoryClass(connect());
+const WorkspaceMemberRepository = new WorkspaceMemberRepositoryClass(
+	await connect()
+);
 
 export default WorkspaceMemberRepository;

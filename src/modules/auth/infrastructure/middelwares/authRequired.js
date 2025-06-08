@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 
 export function createAuthRequiredMiddelware(jwt_secret) {
-	return function (req, res, next) {
+	return async function (req, res, next) {
 		const { token } = req.cookies;
 		if (!token)
 			return res.status(401).json({ error: 'User not authenticated' });
@@ -13,8 +13,8 @@ export function createAuthRequiredMiddelware(jwt_secret) {
 			}
 
 			if (user.payload.id) {
-				req.user.id = user.payload.id;
-				next();
+				req.user = { id: user.payload.id };
+				return next();
 			}
 			return res
 				.status(403)

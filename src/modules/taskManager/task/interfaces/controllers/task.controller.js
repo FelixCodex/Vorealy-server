@@ -1,10 +1,10 @@
-import createTask from '../../use-cases/createTask';
-import deleteTask from '../../use-cases/deleteTask';
-import deleteTasksByListId from '../../use-cases/deleteTasksByListId';
-import getAllTasks from '../../use-cases/getAllTasks';
-import getTaskById from '../../use-cases/getTaskById';
-import getTasksByListId from '../../use-cases/getTasksByListId';
-import updateTask from '../../use-cases/updateTask';
+import createTask from '../../use-cases/createTask.js';
+import deleteTask from '../../use-cases/deleteTask.js';
+import deleteTasksByListId from '../../use-cases/deleteTasksByListId.js';
+import getAllTasks from '../../use-cases/getAllTasks.js';
+import getTaskById from '../../use-cases/getTaskById.js';
+import getTasksByListId from '../../use-cases/getTasksByListId.js';
+import updateTask from '../../use-cases/updateTask.js';
 
 export default function createTaskController(taskRepository) {
 	const getAllTasksUseCase = getAllTasks(taskRepository);

@@ -5,7 +5,8 @@
  */
 export default function workspacePermissionMiddleware(
 	workspaceMemberRepository,
-	allowedRoles = []
+	allowedRoles = [],
+	workpaceRepository
 ) {
 	return async (req, res, next) => {
 		try {
@@ -17,6 +18,12 @@ export default function workspacePermissionMiddleware(
 					success: false,
 					message: 'ID de workspace no proporcionado',
 				});
+			}
+
+			const workspace = await workpaceRepository.getById(workspaceId);
+
+			if (workspace.owner_id == userId) {
+				return next();
 			}
 
 			const member = await workspaceMemberRepository.getMember(

@@ -1,4 +1,4 @@
-import { connect } from './connection';
+import { connect } from './connection.js';
 
 class FolderRepositoryClass {
 	constructor(connection) {
@@ -307,6 +307,6 @@ class FolderRepositoryClass {
 		}
 	}
 }
-const FolderRepository = new FolderRepositoryClass(connect());
 
+const FolderRepository = new FolderRepositoryClass(await connect());
 export default FolderRepository;

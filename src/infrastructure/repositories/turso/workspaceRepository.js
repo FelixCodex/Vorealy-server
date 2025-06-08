@@ -1,4 +1,4 @@
-import { connect } from './connection';
+import { connect } from './connection.js';
 
 class WorkspaceRepositoryClass {
 	constructor(connection) {
@@ -38,7 +38,7 @@ class WorkspaceRepositoryClass {
 				`SELECT HEX(id) id, HEX (owner_id) owner_id, name, icon_id, color, created_at, updated_at FROM workspaces WHERE id = UNHEX(?);`,
 				[id]
 			);
-			return rows[0] || null;
+			return rows[0];
 		} catch (err) {
 			console.error('Error en WorkspaceRepository.getById:', err);
 			throw err;
@@ -48,15 +48,15 @@ class WorkspaceRepositoryClass {
 	async create({ id, name, owner_id, icon_id, color, created_at }) {
 		const hexId = id.replace(/-/g, '');
 		try {
-			const task = await this.connection.execute(
+			const { rows } = await this.connection.execute(
 				`INSERT INTO workspaces(id, name, owner_id, icon_id, color, created_at, updated_at) 
                 VALUES(UNHEX(?),?,UNHEX(?),?,?,?,?)
                 RETURNING HEX(id) AS id, name,HEX (owner_id) owner_id, icon_id, color, created_at, updated_at;`,
 				[hexId, name, owner_id, icon_id, color, created_at, created_at]
 			);
-			return task;
+			return rows[0];
 		} catch (e) {
-			console.error('Error en WorkspaceRepository.create:', err);
+			console.error('Error en WorkspaceRepository.create:', e);
 			throw e;
 		}
 	}
@@ -87,33 +87,32 @@ class WorkspaceRepositoryClass {
 
 			values.push(id);
 
-			const workspace = await db.execute(
+			const { rows } = await this.connection.execute(
 				`UPDATE workspaces SET ${updates.join(', ')} WHERE id = UNHEX(?)   
-				 RETURNING HEX(id) AS id, name, HEX(owner_id) AS owner_id, created_at;`,
+				 RETURNING HEX(id) id, name, HEX(owner_id) owner_id, created_at;`,
 				values
 			);
-			return workspace;
+			return rows[0];
 		} catch (e) {
-			console.error('Error en WorkspaceRepository.updatePropertie:', err);
-			console.error('Propertie to update: ', property);
-			console.error('Value to update: ', value);
+			console.error('Error en WorkspaceRepository.update:', e);
 			throw e;
 		}
 	}
 
 	async delete(id) {
 		try {
-			await connection.execute(`DELETE FROM workspaces WHERE id = UNHEX(?);`, [
-				id,
-			]);
-			return { success: true, message: 'Workspace eliminado correctamente' };
+			await this.connection.execute(
+				`DELETE FROM workspaces WHERE id = UNHEX(?);`,
+				[id]
+			);
+			return true;
 		} catch (e) {
-			console.error('Error en WorkspaceRepository.delete:', err);
+			console.error('Error en WorkspaceRepository.delete:', e);
 			throw e;
 		}
 	}
 }
 
-const WorkspaceRepository = new WorkspaceRepositoryClass(connect());
+const WorkspaceRepository = new WorkspaceRepositoryClass(await connect());
 
 export default WorkspaceRepository;

@@ -1,5 +1,5 @@
 import { createClient } from '@libsql/client';
-import { TURSO_AUTH, TURSO_URL } from './config.js';
+import { TURSO_AUTH, TURSO_URL } from '../../../config.js';
 
 const connection = createClient({
 	url: TURSO_URL,

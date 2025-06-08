@@ -1,14 +1,14 @@
 import {
 	folderIdParamSchema,
 	projectIdParamSchema,
-} from '../../infrastructure/schemas/folder.schema';
-import createFolder from '../../use-cases/createFolder';
-import deleteFolder from '../../use-cases/deleteFolder';
-import deleteFoldersByProjectId from '../../use-cases/deleteFoldersByProjectId';
-import getAllFolders from '../../use-cases/getAllFolders';
-import getFolderById from '../../use-cases/getFolderById';
-import getFoldersByProjectId from '../../use-cases/getFoldersByProjectId';
-import updateFolder from '../../use-cases/updateFolder';
+} from '../../infrastructure/schemas/folder.schema.js';
+import createFolder from '../../use-cases/createFolder.js';
+import deleteFolder from '../../use-cases/deleteFolder.js';
+import deleteFoldersByProjectId from '../../use-cases/deleteFoldersByProjectId.js';
+import getAllFolders from '../../use-cases/getAllFolders.js';
+import getFolderById from '../../use-cases/getFolderById.js';
+import getFoldersByProjectId from '../../use-cases/getFoldersByProjectId.js';
+import updateFolder from '../../use-cases/updateFolder.js';
 
 export default function createFolderController(folderRepository) {
 	const getAllFoldersUseCase = getAllFolders(folderRepository);

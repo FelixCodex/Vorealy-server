@@ -1,10 +1,10 @@
-import createTask from '../../use-cases/createSubTask';
-import deleteTask from '../../use-cases/deleteSubTask';
-import deleteTasksByTaskId from '../../use-cases/deleteSubTasksByTaskId';
-import getAllTasks from '../../use-cases/getAllSubTasks';
-import getTaskById from '../../use-cases/getSubTaskById';
-import getTasksByTaskId from '../../use-cases/getSubTasksByTaskId';
-import updateTask from '../../use-cases/updateSubTask';
+import createTask from '../../use-cases/createSubTask.js';
+import deleteTask from '../../use-cases/deleteSubTask.js';
+import deleteTasksByTaskId from '../../use-cases/deleteSubTasksByTaskId.js';
+import getAllTasks from '../../use-cases/getAllSubTasks.js';
+import getTaskById from '../../use-cases/getSubTaskById.js';
+import getTasksByTaskId from '../../use-cases/getSubTasksByTaskId.js';
+import updateTask from '../../use-cases/updateSubTask.js';
 
 export default function createSubTaskController(subtaskRepository) {
 	const getAllSubTasksUseCase = getAllTasks(subtaskRepository);

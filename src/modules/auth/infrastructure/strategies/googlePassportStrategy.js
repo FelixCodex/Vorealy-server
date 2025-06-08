@@ -1,6 +1,9 @@
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import crypto from 'node:crypto';
-import { AUTHENTICATION_ERROR, CREATING_ERROR } from '../../constants/errors';
+import {
+	AUTHENTICATION_ERROR,
+	CREATING_ERROR,
+} from '../../constants/errors.js';
 
 export function configureGoogleStrategy(
 	passport,

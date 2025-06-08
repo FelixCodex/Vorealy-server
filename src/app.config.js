@@ -11,9 +11,9 @@ import {
 	ListRepository,
 	TaskRepository,
 	SubTaskRepository,
-	connect,
+	WorkspaceInvitationRepository,
+	NotificationRepository,
 } from './infrastructure/repositories/turso/index.js';
-import { configureGoogleStrategy } from './modules/auth/infrastructure/services/googlePassportStrategy.js';
 import { createGoogleAuthRouter } from './routes/authGoogle.routes.js';
 import { createWorkspaceRouter } from './routes/workspace.routes.js';
 import { createWorkspaceMemberRouter } from './routes/workspaceMember.routes.js';
@@ -24,18 +24,12 @@ import { createTaskRouter } from './routes/task.routes.js';
 import { createSubTaskRouter } from './routes/subtask.routes.js';
 import { createAuthRouter } from './routes/auth.routes.js';
 import { createRegisterSocketEvents } from './modules/webSocket/application/socket.events.js';
-import app from './app.js';
-
-// --- Repository Connection
-const connection = connect();
-const UserRepository = new UserRepository(connection);
-const WorkspaceRepository = new WorkspaceRepository(connection);
-const WorkspaceMemberRepository = new WorkspaceMemberRepository(connection);
-const ProjectRepository = new ProjectRepository(connection);
-const FolderRepository = new FolderRepository(connection);
-const ListRepository = new ListRepository(connection);
-const TaskRepository = new TaskRepository(connection);
-const SubTaskRepository = new SubTaskRepository(connection);
+import { configureGoogleStrategy } from './modules/auth/infrastructure/strategies/googlePassportStrategy.js';
+import { SECRET_JWT_KEY, CLIENT_URL } from './config.js';
+import { createWorkspaceInvitationRouter } from './routes/workspaceInvitation.routes.js';
+import { WorkspaceMemberService } from './modules/taskManager/workspace/interfaces/services/workspaceMember.service.js';
+import { NotificationService } from './modules/notifications/interfaces/services/notification.service.js';
+import { createNotificationRouter } from './routes/notification.routes.js';
 
 // -----------------------------------
 
@@ -44,44 +38,67 @@ dotenv.config();
 // -----------------------------------
 
 // --- Google Auth Configuration
-const sessionConfig = {
-	secret: SECRET_JWT_KEY,
-	resave: false,
-	saveUninitialized: true,
-	cookie: { secure: false },
-};
-configureGoogleStrategy(passport, {
-	userRepository: UserRepository,
-	CLIENT_URL,
-});
-app.use(session(sessionConfig));
-app.use(passport.initialize());
-app.use(passport.session());
-app.use('/app', createGoogleAuthRouter({ passport, CLIENT_URL }));
+// const sessionConfig = {
+// 	secret: SECRET_JWT_KEY,
+// 	resave: false,
+// 	saveUninitialized: true,
+// 	cookie: { secure: false },
+// };
+// configureGoogleStrategy(passport, {
+// 	userRepository: UserRepository,
+// 	CLIENT_URL,
+// });
 
-// -----------------------------------
+export function configurateApp(app) {
+	// --- Google Auth Config
 
-// --- Routes
-app.use('/app', createAuthRouter(UserRepository));
-app.use(
-	'/app/workspace/:workspaceId',
-	createWorkspaceRouter(WorkspaceRepository)
-);
-app.use(
-	'/app/workspace/:workspaceId',
-	createWorkspaceMemberRouter(WorkspaceMemberRepository)
-);
-app.use('/app/workspace/:workspaceId', createProjectRouter(ProjectRepository));
-app.use('/app/workspace/:workspaceId', createFolderRouter(FolderRepository));
-app.use('/app/workspace/:workspaceId', createListRouter(ListRepository));
-app.use('/app/workspace/:workspaceId', createTaskRouter(TaskRepository));
-app.use('/app/workspace/:workspaceId', createSubTaskRouter(SubTaskRepository));
+	// app.use(session(sessionConfig));
+	// app.use(passport.initialize());
+	// app.use(passport.session());
+	// app.use('/app', createGoogleAuthRouter({ passport, CLIENT_URL }));
+
+	// -----------------------------------
+
+	// --- Services
+
+	const MemeberService = new WorkspaceMemberService(
+		WorkspaceMemberRepository,
+		WorkspaceRepository
+	);
+	const Notification_Service = new NotificationService(NotificationRepository);
+
+	// --- Routes
+	app.use('/app', createAuthRouter(UserRepository));
+	app.use('/app', createWorkspaceRouter(WorkspaceRepository));
+	app.use(
+		'/app',
+		createWorkspaceMemberRouter(WorkspaceRepository, WorkspaceMemberRepository)
+	);
+	app.use('/app', createProjectRouter(ProjectRepository));
+	app.use('/app', createNotificationRouter(NotificationRepository));
+	app.use(
+		'/app',
+		createWorkspaceInvitationRouter(
+			WorkspaceInvitationRepository,
+			WorkspaceRepository,
+			WorkspaceMemberRepository,
+			UserRepository,
+			MemeberService,
+			Notification_Service
+		)
+	);
+	app.use('/app', createFolderRouter(FolderRepository));
+	app.use('/app', createListRouter(ListRepository));
+	app.use('/app', createTaskRouter(TaskRepository));
+	app.use('/app', createSubTaskRouter(SubTaskRepository));
+}
 
 // -----------------------------------
 
 // --- WebSockets Events
-const registerSocketEvents = createRegisterSocketEvents({ UserRepository });
 
-// -----------------------------------
+// ----------------
 
-export default { app, registerSocketEvents };
+export const registerSocketEvents = createRegisterSocketEvents({
+	UserRepository,
+});

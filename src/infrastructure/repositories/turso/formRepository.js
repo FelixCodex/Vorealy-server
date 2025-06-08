@@ -1,4 +1,4 @@
-import { connect } from './connection';
+import { connect } from './connection.js';
 
 class FormRepositoryClass {
 	constructor(connection) {
@@ -205,6 +205,6 @@ class FormRepositoryClass {
 	}
 }
 
-const FormRepository = new FormRepositoryClass(connect());
+const FormRepository = new FormRepositoryClass(await connect());
 
 export default FormRepository;

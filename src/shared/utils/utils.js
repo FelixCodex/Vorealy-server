@@ -119,3 +119,40 @@ export function parseRange(rangeHeader, fileSize) {
 
 	return [start, end];
 }
+
+export function getDateNow(date = new Date()) {
+	const h = date.getHours();
+	const m = date.getMinutes();
+	const s = date.getSeconds();
+	const y = date.getFullYear();
+	const mo = date.getMonth();
+	const d = date.getDate();
+	return `${y}-${mo}-${d} ${fNum(h)}:${fNum(m)}:${fNum(s)}`;
+}
+
+export function getFutureDate(num) {
+	const date = new Date();
+	const y = date.getFullYear();
+	const mo = date.getMonth();
+	const d = date.getDate();
+	const h = date.getHours();
+	const m = date.getMinutes();
+	const s = date.getSeconds();
+	return new Date(y, mo, d + num, h, m, s);
+}
+
+/**
+ * Compara dos fechas y retorna true si la primera fecha es mayor que la segunda y viseversa
+ */
+export function compareDates(date1 = new Date(), date2 = new Date()) {
+	const first = new Date(date1).getTime();
+	const sec = new Date(date2).getTime();
+	if (first > sec) {
+		return true;
+	}
+	return false;
+}
+
+function fNum(num) {
+	return isNaN(num) ? null : num < 10 ? `0${num}` : num;
+}

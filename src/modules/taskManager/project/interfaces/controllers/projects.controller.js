@@ -1,10 +1,10 @@
-import createProject from '../../use-cases/createProject';
-import deleteProject from '../../use-cases/deleteProject';
-import deleteProjectsByWorkspaceId from '../../use-cases/deleteProjectsByWorkspaceId';
-import getAllProjects from '../../use-cases/getAllProjects';
-import getProjectById from '../../use-cases/getProjectById';
-import getProjectsByWorkspaceId from '../../use-cases/getProjectsByWorkspaceId';
-import updateProject from '../../use-cases/updateProject';
+import createProject from '../../use-cases/createProject.js';
+import deleteProject from '../../use-cases/deleteProject.js';
+import deleteProjectsByWorkspaceId from '../../use-cases/deleteProjectsByWorkspaceId.js';
+import getAllProjects from '../../use-cases/getAllProjects.js';
+import getProjectById from '../../use-cases/getProjectById.js';
+import getProjectsByWorkspaceId from '../../use-cases/getProjectsByWorkspaceId.js';
+import updateProject from '../../use-cases/updateProject.js';
 
 export default function createProjectController(projectRepository) {
 	const getAllProjectsUseCase = getAllProjects(projectRepository);

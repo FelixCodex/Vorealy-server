@@ -1,8 +1,8 @@
-import { assignCustomProperty } from '../../use-cases/assignCustomProperty';
-import { createCustomProperty } from '../../use-cases/createCustomProperty';
-import { getEntityProperties } from '../../use-cases/getEntityProperties';
+import { assignCustomProperty } from '../../use-cases/assignCustomProperty.js';
+import { createCustomProperty } from '../../use-cases/createCustomProperty.js';
+import { getEntityProperties } from '../../use-cases/getEntityProperties.js';
 
-export function createCustomPropertyController(Repository) {
+export default function createCustomPropertyController(Repository) {
 	const createCustomPropertyUseCase = createCustomProperty(Repository);
 	const assignCustomPropertyUseCase = assignCustomProperty(Repository);
 	const getEntityPropertiesUseCase = getEntityProperties(Repository);

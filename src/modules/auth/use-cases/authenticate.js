@@ -1,18 +1,21 @@
-import bcrypt from 'bcryptjs';
-
-export default async function authenticate({ userRepository }) {
+export default function authenticateUser({ userRepository, compare }) {
 	return async function ({ password, email }) {
-		const user = userRepository.getByEmail(email);
-		if (!user) return new Error('User not found');
+		try {
+			const user = await userRepository.getByEmail(email);
+			if (!user) throw new Error('User not found');
 
-		const isMatch = await bcrypt.compare(password, `${user.password}`);
-		if (!isMatch) return new Error('Password does not match');
+			const isMatch = await compare(password, `${user.password}`);
+			if (!isMatch) throw new Error('Password does not match');
 
-		return {
-			id: user.rows[0].id,
-			username: user.rows[0].username,
-			email: user.rows[0].email,
-			preferences: JSON.parse(user.rows[0].preferences),
-		};
+			return {
+				id: user.id,
+				username: user.username,
+				email: user.email,
+				preferences: user.preferences,
+			};
+		} catch (error) {
+			console.log(error);
+			throw error;
+		}
 	};
 }

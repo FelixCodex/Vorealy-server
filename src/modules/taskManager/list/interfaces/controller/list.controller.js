@@ -2,14 +2,14 @@ import {
 	listIdParamSchema,
 	listParentParamsSchema,
 	workspaceIdParamSchema,
-} from '../../infrastructure/schemas/list.schema';
-import createList from '../../use-cases/createList';
-import deleteList from '../../use-cases/deleteList';
-import deleteListsByParent from '../../use-cases/deleteListsByParent';
-import getAllLists from '../../use-cases/getAllLists';
-import getListById from '../../use-cases/getListById';
-import getListsByParent from '../../use-cases/getListsByParent';
-import updateList from '../../use-cases/updateList';
+} from '../../infrastructure/schemas/list.schema.js';
+import createList from '../../use-cases/createList.js';
+import deleteList from '../../use-cases/deleteList.js';
+import deleteListsByParent from '../../use-cases/deleteListsByParent.js';
+import getAllLists from '../../use-cases/getAllLists.js';
+import getListById from '../../use-cases/getListById.js';
+import getListsByParent from '../../use-cases/getListsByParent.js';
+import updateList from '../../use-cases/updateList.js';
 
 export default function createListController(listRepository) {
 	const getAllListsUseCase = getAllLists(listRepository);

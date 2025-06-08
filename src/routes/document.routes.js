@@ -1,6 +1,8 @@
 import { Router } from 'express';
-import createDocumentController from '../modules/documents/interfaces/controllers/document.controller';
-import { createAuthRequiredMiddelware } from '../modules/auth/infrastructure/middelwares/authRequired';
+import createDocumentController from '../modules/documents/interfaces/controllers/document.controller.js';
+import workspacePermissionMiddleware from '../modules/taskManager/workspace/infrastructure/middleware/workspacePermission.js';
+import workspaceMatchMiddleware from '../modules/taskManager/workspace/infrastructure/middleware/workspaceMatch.js';
+import { createAuthRequiredMiddelware } from '../modules/auth/infrastructure/middelwares/authRequired.js';
 import {
 	createDocumentInputSchema,
 	updateDocumentInputSchema,

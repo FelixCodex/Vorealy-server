@@ -1,20 +1,14 @@
 import { Router } from 'express';
-import createSubTaskController from '../modules/taskManager/subtask/interfaces/controllers/subtask.controller';
-import workspacePermissionMiddleware from '../modules/taskManager/workspace/infrastructure/workspacePermission';
-import workspaceMatchMiddleware from '../modules/taskManager/workspace/infrastructure/workspaceMatch';
-import { createAuthRequiredMiddelware } from '../modules/auth/infrastructure/middelwares/authRequired';
-import { SECRET_JWT_KEY } from '../config';
+import createSubTaskController from '../modules/taskManager/subtask/interfaces/controllers/subtask.controller.js';
+import workspacePermissionMiddleware from '../modules/taskManager/workspace/infrastructure/middleware/workspacePermission.js';
+import workspaceMatchMiddleware from '../modules/taskManager/workspace/infrastructure/middleware/workspaceMatch.js';
+import { createAuthRequiredMiddelware } from '../modules/auth/infrastructure/middelwares/authRequired.js';
+import { SECRET_JWT_KEY } from '../config.js';
 import {
 	createSubTaskInputSchema,
-	CreateSubTaskSchema,
-	DeleteSubTasksByTaskIdSchema,
-	DeleteSubTaskSchema,
-	GetSubTaskByIdSchema,
-	GetSubTasksByTaskIdSchema,
 	updateSubTaskInputSchema,
-	UpdateSubTaskSchema,
-} from '../modules/taskManager/subtask/infrastructure/schemas/subtask.schema';
-import { validateSchema } from '../shared/middlewares/validateSchemaMiddleware';
+} from '../modules/taskManager/subtask/infrastructure/schemas/subtask.schema.js';
+import { validateSchema } from '../shared/middlewares/validateSchemaMiddleware.js';
 
 export const createSubTaskRouter = Repository => {
 	const router = Router();

@@ -1,5 +1,5 @@
-import { SECRET_JWT_KEY } from '../config.js';
 import jwt from 'jsonwebtoken';
+import { SECRET_JWT_KEY } from '../../../config.js';
 
 export async function asignAccessToken(res, config, payload) {
 	const token = await createAccessToken(payload);

@@ -1,4 +1,4 @@
-import { connect } from './connection';
+import { connect } from './connection.js';
 
 class ListRepositoryClass {
 	constructor(connection) {
@@ -371,6 +371,6 @@ class ListRepositoryClass {
 	}
 }
 
-const ListRepository = new ListRepositoryClass(connect());
+const ListRepository = new ListRepositoryClass(await connect());
 
 export default ListRepository;

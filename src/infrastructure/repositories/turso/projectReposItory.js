@@ -1,4 +1,9 @@
-import { connect } from './connection';
+import { connect } from './connection.js';
+
+const RETURNING = `HEX(id) AS id, HEX(workspace_id) AS workspace_id, name, description, color,
+  				   icon, visibility, features_enabled, automation_rules, created_at, 
+				   HEX(created_by) AS created_by, updated_at, HEX(updated_by) AS updated_by, 
+				   completed_at, estimated_hours, working_days, working_hours, holidays, tags, metadata`;
 
 class ProjectRepositoryClass {
 	constructor(connection) {
@@ -8,28 +13,7 @@ class ProjectRepositoryClass {
 	async getAll() {
 		try {
 			const { rows } = await this.connection.execute(
-				`SELECT 
-          HEX(id) AS id, 
-          HEX(workspace_id) AS workspace_id, 
-          name, 
-          description, 
-          color, 
-          icon, 
-          visibility, 
-          features_enabled, 
-          automation_rules, 
-          created_at, 
-          HEX(created_by) AS created_by, 
-          updated_at, 
-          HEX(updated_by) AS updated_by, 
-          completed_at, 
-          estimated_hours, 
-          working_days, 
-          working_hours, 
-          holidays, 
-          tags, 
-          metadata 
-        FROM projects;`
+				`SELECT ${RETURNING} FROM projects;`
 			);
 			return rows;
 		} catch (err) {
@@ -41,29 +25,8 @@ class ProjectRepositoryClass {
 	async getById(id) {
 		try {
 			const { rows } = await this.connection.execute(
-				`SELECT 
-          HEX(id) AS id, 
-          HEX(workspace_id) AS workspace_id, 
-          name, 
-          description, 
-          color, 
-          icon, 
-          visibility, 
-          features_enabled, 
-          automation_rules, 
-          created_at, 
-          HEX(created_by) AS created_by, 
-          updated_at, 
-          HEX(updated_by) AS updated_by, 
-          completed_at, 
-          estimated_hours, 
-          working_days, 
-          working_hours, 
-          holidays, 
-          tags, 
-          metadata 
-        FROM projects 
-        WHERE id = UNHEX(?);`,
+				`SELECT ${RETURNING} FROM projects 
+        		WHERE id = UNHEX(?);`,
 				[id]
 			);
 			return rows[0] || null;
@@ -76,29 +39,8 @@ class ProjectRepositoryClass {
 	async getByWorkspaceId(workspaceId) {
 		try {
 			const { rows } = await this.connection.execute(
-				`SELECT 
-          HEX(id) AS id, 
-          HEX(workspace_id) AS workspace_id, 
-          name, 
-          description, 
-          color, 
-          icon, 
-          visibility, 
-          features_enabled, 
-          automation_rules, 
-          created_at, 
-          HEX(created_by) AS created_by, 
-          updated_at, 
-          HEX(updated_by) AS updated_by, 
-          completed_at, 
-          estimated_hours, 
-          working_days, 
-          working_hours, 
-          holidays, 
-          tags, 
-          metadata 
-        FROM projects 
-        WHERE workspace_id = UNHEX(?);`,
+				`SELECT ${RETURNING} FROM projects 
+        		WHERE workspace_id = UNHEX(?);`,
 				[workspaceId]
 			);
 			return rows;
@@ -175,27 +117,7 @@ class ProjectRepositoryClass {
           ?, 
           ?, 
           ?
-        ) RETURNING 
-          HEX(id) AS id, 
-          HEX(workspace_id) AS workspace_id, 
-          name, 
-          description, 
-          color, 
-          icon, 
-          visibility, 
-          features_enabled, 
-          automation_rules, 
-          created_at, 
-          HEX(created_by) AS created_by, 
-          updated_at, 
-          HEX(updated_by) AS updated_by, 
-          completed_at, 
-          estimated_hours, 
-          working_days, 
-          working_hours, 
-          holidays, 
-          tags, 
-          metadata;`,
+        ) RETURNING ${RETURNING};`,
 				[
 					hexId,
 					workspaceId,
@@ -325,27 +247,7 @@ class ProjectRepositoryClass {
 				`UPDATE projects 
          SET ${updates.join(', ')} 
          WHERE id = UNHEX(?) 
-         RETURNING 
-           HEX(id) AS id, 
-           HEX(workspace_id) AS workspace_id, 
-           name, 
-           description, 
-           color, 
-           icon, 
-           visibility, 
-           features_enabled, 
-           automation_rules, 
-           created_at, 
-           HEX(created_by) AS created_by, 
-           updated_at, 
-           HEX(updated_by) AS updated_by, 
-           completed_at, 
-           estimated_hours, 
-           working_days, 
-           working_hours, 
-           holidays, 
-           tags, 
-           metadata;`,
+         RETURNING ${RETURNING};`,
 				values
 			);
 			return rows[0] || null;
@@ -381,5 +283,5 @@ class ProjectRepositoryClass {
 		}
 	}
 }
-const ProjectRepository = new ProjectRepositoryClass(connect());
+const ProjectRepository = new ProjectRepositoryClass(await connect());
 export default ProjectRepository;

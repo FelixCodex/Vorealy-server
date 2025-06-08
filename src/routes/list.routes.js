@@ -1,14 +1,14 @@
 import { Router } from 'express';
-import createListController from '../modules/taskManager/list/interfaces/controllers/list.controller';
-import workspacePermissionMiddleware from '../modules/taskManager/workspace/infrastructure/workspacePermission';
-import workspaceMatchMiddleware from '../modules/taskManager/workspace/infrastructure/workspaceMatch';
-import { createAuthRequiredMiddelware } from '../modules/auth/infrastructure/middelwares/authRequired';
-import { SECRET_JWT_KEY } from '../config';
-import { validateSchema } from '../shared/middlewares/validateSchemaMiddleware';
+import workspacePermissionMiddleware from '../modules/taskManager/workspace/infrastructure/middleware/workspacePermission.js';
+import workspaceMatchMiddleware from '../modules/taskManager/workspace/infrastructure/middleware/workspaceMatch.js';
+import { createAuthRequiredMiddelware } from '../modules/auth/infrastructure/middelwares/authRequired.js';
+import { SECRET_JWT_KEY } from '../config.js';
+import { validateSchema } from '../shared/middlewares/validateSchemaMiddleware.js';
 import {
 	createListInputSchema,
 	updateListInputSchema,
-} from '../modules/taskManager/list/infrastructure/schemas/list.schema';
+} from '../modules/taskManager/list/infrastructure/schemas/list.schema.js';
+import createListController from '../modules/taskManager/list/interfaces/controller/list.controller.js';
 
 export const createListRouter = Repository => {
 	const router = Router();
@@ -64,7 +64,7 @@ export const createListRouter = Repository => {
 		workspaceMatchMiddleware(
 			Repository,
 			['parentId', 'parentType'],
-			'getByParentId'
+			'getByParent'
 		),
 		listController.deleteListsByParent
 	);

@@ -1,9 +1,11 @@
-import { connect } from './connection';
+import { connect } from './connection.js';
 
 const DEFAUL_PREFERENCES = {
 	language: 'en',
 	notifications: true,
 };
+
+const RETURNING_OBJ = 'HEX(id) AS id, username, email, preferences';
 
 class UserRepositoryClass {
 	constructor(connection) {
@@ -19,7 +21,7 @@ class UserRepositoryClass {
 
 	async getByEmail(email) {
 		const { rows } = await this.connection.execute(
-			'SELECT HEX(id) id, username, email, preferences FROM users WHERE email = ?;',
+			`SELECT HEX(id) AS id, username, email, password, preferences FROM users WHERE email = ?;`,
 			[email]
 		);
 		return parsePreferences(rows[0]);
@@ -27,25 +29,26 @@ class UserRepositoryClass {
 
 	async getById(id) {
 		const { rows } = await this.connection.execute(
-			'SELECT HEX(id) id, username, email, preferences FROM users WHERE id = UNHEX(?);',
+			`SELECT ${RETURNING_OBJ} FROM users WHERE id = UNHEX(?);`,
 			[id]
 		);
 		return parsePreferences(rows[0]);
 	}
 
-	async create({ id, username, password, email }) {
+	async create({ id, username, password, email, createdAt }) {
+		const hexId = id.replace(/-/g, '');
+		const preferences = JSON.stringify(DEFAUL_PREFERENCES);
 		try {
-			const user = await this.connection.execute(
+			const { rows } = await this.connection.execute(
 				`INSERT INTO users(id, username, password, email, preferences) 
-                VALUES(UNHEX(REPLACE("${id}", "-","")),?,?,?,?)
-                RETURNING HEX(id) AS id, username, email, preferences;`,
-				[username, password, email, JSON.stringify(DEFAUL_PREFERENCES)]
+                VALUES(UNHEX(?),?,?,?,?)
+                RETURNING ${RETURNING_OBJ};`,
+				[hexId, username, password, email, preferences]
 			);
-			console.log('User created successfully, sending back response');
-			return { ...user, preferences: JSON.parse(user.preferences) };
+			return { ...rows[0], preferences: DEFAUL_PREFERENCES };
 		} catch (e) {
 			console.log(e);
-			return null;
+			throw e;
 		}
 	}
 
@@ -81,10 +84,12 @@ function parsePreferences(user) {
 		console.error('Failed to parse preferences: ', e);
 		return {
 			...user,
-			preferences: {}, // valor por defecto en caso de error
+			preferences: {},
 		};
 	}
 }
 
-const UserRepository = new UserRepositoryClass(connect());
+const connection = await connect();
+const UserRepository = new UserRepositoryClass(connection);
+
 export default UserRepository;

@@ -1,4 +1,4 @@
-class Workspace {
+export class Workspace {
 	constructor(
 		id,
 		owner_id,

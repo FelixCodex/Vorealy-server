@@ -1,60 +1,63 @@
 import { Router } from 'express';
-import createWorkspaceMemberController from '../modules/workspace/workspace/interfaces/controllers/workspaceMember.controller';
-import { createAuthRequiredMiddelware } from '../modules/auth/infrastructure/middelwares/authRequired';
-import { SECRET_JWT_KEY } from '../config';
-import workspacePermissionMiddleware from '../modules/taskManager/workspace/infrastructure/workspacePermission';
+import { createAuthRequiredMiddelware } from '../modules/auth/infrastructure/middelwares/authRequired.js';
+import { SECRET_JWT_KEY } from '../config.js';
 import {
 	addWorkspaceMemberInputSchema,
 	updateWorkspaceMemberRoleInputSchema,
-} from '../modules/taskManager/workspace/infrastructure/schemas/workspaceMember.schema';
+} from '../modules/taskManager/workspace/infrastructure/schemas/workspaceMember.schema.js';
+import createWorkspaceMemberController from '../modules/taskManager/workspace/interfaces/controllers/workspaceMember.controller.js';
+import workspacePermissionMiddleware from '../modules/taskManager/workspace/infrastructure/middleware/workspacePermission.js';
+import { validateSchema } from '../shared/middlewares/validateSchemaMiddleware.js';
 
-export const createWorkspaceMemberRouter = Repository => {
+export const createWorkspaceMemberRouter = (WorkspaceRepo, MemberRepo) => {
 	const router = Router();
 
-	const workspaceMemberController = createWorkspaceMemberController(Repository);
+	const workspaceMemberController = createWorkspaceMemberController(MemberRepo);
 	const authRequired = createAuthRequiredMiddelware(SECRET_JWT_KEY);
 
 	router.get(
 		'/workspaces/:workspaceId/members',
 		authRequired,
-		workspacePermissionMiddleware(['admin', 'member']),
+		workspacePermissionMiddleware(
+			MemberRepo,
+			['admin', 'member'],
+			WorkspaceRepo
+		),
 		workspaceMemberController.getMembers
+	);
+
+	router.get(
+		'/memberships',
+		authRequired,
+		workspaceMemberController.getUserMemberships
 	);
 
 	router.get(
 		'/workspaces/:workspaceId/members/:userId',
 		authRequired,
-		workspacePermissionMiddleware(['admin']),
+		workspacePermissionMiddleware(MemberRepo, ['admin'], WorkspaceRepo),
 		workspaceMemberController.getMember
-	);
-
-	router.post(
-		'/workspaces/:workspaceId/members',
-		authRequired,
-		validateSchema(addWorkspaceMemberInputSchema),
-		workspacePermissionMiddleware(['admin']),
-		workspaceMemberController.addMember
 	);
 
 	router.put(
 		'/workspaces/:workspaceId/members/:userId',
 		authRequired,
 		validateSchema(updateWorkspaceMemberRoleInputSchema),
-		workspacePermissionMiddleware(['admin']),
+		workspacePermissionMiddleware(MemberRepo, ['admin'], WorkspaceRepo),
 		workspaceMemberController.updateRole
 	);
 
 	router.delete(
 		'/workspaces/:workspaceId/members/:userId',
 		authRequired,
-		workspacePermissionMiddleware(['admin']),
+		workspacePermissionMiddleware(MemberRepo, ['admin'], WorkspaceRepo),
 		workspaceMemberController.removeMember
 	);
 
 	router.delete(
 		'/workspaces/:workspaceId/members',
 		authRequired,
-		workspacePermissionMiddleware(['admin']),
+		workspacePermissionMiddleware(MemberRepo, ['admin'], WorkspaceRepo),
 		workspaceMemberController.removeAllMembers
 	);
 

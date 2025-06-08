@@ -1,4 +1,4 @@
-import registerAdminEvents from '../events/admin.events';
+import registerAdminEvents from '../events/admin.events.js';
 
 let usersConnected = 0;
 

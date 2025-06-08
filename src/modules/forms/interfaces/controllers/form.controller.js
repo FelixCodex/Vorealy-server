@@ -11,7 +11,7 @@ import getFormSubmissions from '../../use-cases/getFormSubmissions';
 import submitForm from '../../use-cases/submitForm';
 import updateForm from '../../use-cases/updateForm';
 
-export function createFormController(formRepo, formSubmissionRepo) {
+export default function createFormController(formRepo, formSubmissionRepo) {
 	const createFormUC = createForm(formRepo);
 	const getFormByIdUC = getFormById(formRepo);
 	const getFormByProjectIdUC = getFormByProjectId(formRepo);

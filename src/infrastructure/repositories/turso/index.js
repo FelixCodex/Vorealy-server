@@ -1,1 +1,16 @@
-export * from './repositories';
+export { default as ChangeRecordRepository } from './changeRecordRepository.js';
+export { default as CustomPropertyRepository } from './customPropertyRepository.js';
+export { default as DocumentRepository } from './documentRepository.js';
+export { default as FolderRepository } from './folderRepository.js';
+export { default as FormRepository } from './formRepository.js';
+export { default as FormSubmissionRepository } from './formSubmissionRepository.js';
+export { default as ListRepository } from './listRepository.js';
+export { default as ProjectRepository } from './projectReposItory.js';
+export { default as SubTaskRepository } from './subtaskRepository.js';
+export { default as TaskRepository } from './taskRepository.js';
+export { default as UserRepository } from './userRepository.js';
+export { default as WorkspaceMemberRepository } from './workspaceMemberRepository.js';
+export { default as WorkspaceRepository } from './workspaceRepository.js';
+export { default as WorkspaceInvitationRepository } from './workspaceInvitationRepository.js';
+export { default as NotificationRepository } from './notificationRepository.js';
+export { connect } from './connection.js';

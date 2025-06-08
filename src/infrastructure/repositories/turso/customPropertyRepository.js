@@ -1,4 +1,4 @@
-import { connect } from './connection';
+import { connect } from './connection.js';
 
 class CustomPropertyRepositoryClass {
 	constructor(connection) {
@@ -222,5 +222,7 @@ class CustomPropertyRepositoryClass {
 	}
 }
 
-const CustomPropertyRepository = new CustomPropertyRepositoryClass(connect());
+const CustomPropertyRepository = new CustomPropertyRepositoryClass(
+	await connect()
+);
 export default CustomPropertyRepository;

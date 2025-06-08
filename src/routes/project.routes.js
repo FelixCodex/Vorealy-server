@@ -1,16 +1,14 @@
 import { Router } from 'express';
-import createProjectController from '../modules/taskManager/project/interfaces/controllers/project.controller';
-import workspacePermissionMiddleware from '../modules/taskManager/workspace/infrastructure/workspacePermission';
-import workspaceMatchMiddleware from '../modules/taskManager/workspace/infrastructure/workspaceMatch';
-import { createAuthRequiredMiddelware } from '../modules/auth/infrastructure/middelwares/authRequired';
-import { SECRET_JWT_KEY } from '../config';
-import { validateSchema } from '../shared/middlewares/validateSchemaMiddleware';
+import createProjectController from '../modules/taskManager/project/interfaces/controllers/projects.controller.js';
+import { createAuthRequiredMiddelware } from '../modules/auth/infrastructure/middelwares/authRequired.js';
+import { SECRET_JWT_KEY } from '../config.js';
+import { validateSchema } from '../shared/middlewares/validateSchemaMiddleware.js';
 import {
 	createProjectInputSchema,
-	CreateProjectSchema,
 	updateProjectInputSchema,
-	UpdateProjectSchema,
-} from '../modules/taskManager/project/infrastructure/schemas/project.schema';
+} from '../modules/taskManager/project/infrastructure/schemas/project.schema.js';
+import workspacePermissionMiddleware from '../modules/taskManager/workspace/infrastructure/middleware/workspacePermission.js';
+import workspaceMatchMiddleware from '../modules/taskManager/workspace/infrastructure/middleware/workspaceMatch.js';
 
 export const createProjectRouter = Repository => {
 	const router = Router();

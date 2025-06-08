@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { createGoogleController } from '../modules/auth/interfaces/controllers/google.controller';
+import { createGoogleController } from '../modules/auth/interfaces/controllers/google.controller.js';
 
 export const createGoogleAuthRouter = ({ passport, CLIENT_URL }) => {
 	const router = Router();

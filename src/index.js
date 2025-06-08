@@ -1,8 +1,11 @@
-import { app, registerSocketEvents } from './app.config.js';
+import { configurateApp, registerSocketEvents } from './app.config.js';
+import app from './app.js';
 import http from 'node:http';
-import { initSocket } from './socket.io.js';
+import { initSocket } from './modules/webSocket/application/socket.server.js';
 
 const PORT = process.env.PORT || 3000;
+
+configurateApp(app);
 
 const server = http.createServer(app);
 

@@ -1,7 +1,9 @@
 import { Router } from 'express';
-import { createFormController } from '../modules/workspaces/:workspaceId/forms/interfaces/controllers/form.controller';
-import { createAuthRequiredMiddelware } from '../modules/auth/infrastructure/middelwares/authRequired';
-import { SECRET_JWT_KEY } from '../config';
+import { createFormController } from '../modules/workspaces/:workspaceId/forms/interfaces/controllers/form.controller.js';
+import workspacePermissionMiddleware from '../modules/taskManager/workspace/infrastructure/middleware/workspacePermission.js';
+import workspaceMatchMiddleware from '../modules/taskManager/workspace/infrastructure/middleware/workspaceMatch.js';
+import { createAuthRequiredMiddelware } from '../modules/auth/infrastructure/middelwares/authRequired.js';
+import { SECRET_JWT_KEY } from '../config.js';
 import {
 	CreateFormInputSchema,
 	SubmitFormInputSchema,

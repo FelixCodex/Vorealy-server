@@ -1,4 +1,4 @@
-import { connect } from './connection';
+import { connect } from './connection.js';
 
 class SubtaskRepositoryClass {
 	constructor(connection) {
@@ -303,5 +303,5 @@ class SubtaskRepositoryClass {
 		}
 	}
 }
-const SubtaskRepository = new SubtaskRepositoryClass(connect());
+const SubtaskRepository = new SubtaskRepositoryClass(await connect());
 export default SubtaskRepository;

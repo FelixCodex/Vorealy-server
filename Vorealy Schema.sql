@@ -1,3 +1,12 @@
+CREATE TABLE users (
+  id BINARY(16) PRIMARY KEY,
+  username TEXT NOT NULL,
+  email TEXT UNIQUE,
+  password TEXT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  preferences JSON
+);
+
 CREATE TABLE workspaces (
   id BINARY(16) PRIMARY KEY,
   owner_id BINARY(16) NOT NULL,
@@ -7,7 +16,7 @@ CREATE TABLE workspaces (
   created_at DATETIME NOT NULL,
   updated_at DATETIME NOT NULL,
   FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE CASCADE
-  FOREIGN KEY icon_id REFERENCES icons(id)
+  -- FOREIGN KEY icon_id REFERENCES icons(id)
 );
 
 
@@ -231,7 +240,6 @@ CREATE TABLE change_history (
   FOREIGN KEY (user_id) REFERENCES users(id),
 );
 
--- Índices para mejorar el rendimiento de consultas comunes
 CREATE INDEX idx_change_history_entity ON change_history(entity_type, entity_id);
 CREATE INDEX idx_change_history_user ON change_history(user_id);
 CREATE INDEX idx_change_history_timestamp ON change_history(timestamp);
@@ -257,7 +265,7 @@ CREATE TABLE documents (
 );
 
 
-CREATE TABLE IF NOT EXISTS forms (
+CREATE TABLE forms (
   id BINARY(16) PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
   description TEXT,
@@ -277,7 +285,7 @@ CREATE TABLE IF NOT EXISTS forms (
   FOREIGN KEY (workspace_id) REFERENCES workspaces(id)
 );
 
-CREATE TABLE IF NOT EXISTS form_submissions (
+CREATE TABLE form_submissions (
   id BINARY(16) PRIMARY KEY,
   form_id BINARY(16) NOT NULL,
   data JSON NOT NULL,
@@ -290,4 +298,34 @@ CREATE TABLE IF NOT EXISTS form_submissions (
   INDEX idx_form_submissions_submitted_at (submitted_at),
   FOREIGN KEY (form_id) REFERENCES forms(id) ON DELETE CASCADE,
   FOREIGN KEY (submitted_by) REFERENCES users(id)
+);
+
+
+
+CREATE TABLE notifications (
+  id VARCHAR(12) PRIMARY KEY,
+  recipient_id BINARY(16) NOT NULL, 
+  type ENUM('invitation', 'task', 'mention', 'update', 'custom') NOT NULL,
+  title TEXT NOT NULL,
+  message TEXT,
+  data JSON, 
+  is_read BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  FOREIGN KEY (recipient_id) REFERENCES users(id)
+);
+
+CREATE TABLE workspace_invitations (
+  id VARCHAR(12) PRIMARY KEY,
+  workspace_id BINARY(16) NOT NULL,
+  invited_user_id BINARY(16) NOT NULL,
+  invited_by_user_id BINARY(16) NOT NULL,     
+  status ENUM('pending', 'accepted') DEFAULT 'pending',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  responded_at TIMESTAMP NULL,
+  expires_at TIMESTAMP,                 
+  role ENUM('admin', 'member', 'guest') DEFAULT 'member',
+  message TEXT NULL,                            
+  FOREIGN KEY (workspace_id) REFERENCES workspaces(id) ON DELETE CASCADE,
+  FOREIGN KEY (invited_user_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (invited_by_user_id) REFERENCES users(id) ON DELETE SET NULL
 );

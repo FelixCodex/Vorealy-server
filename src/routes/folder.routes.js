@@ -1,14 +1,14 @@
 import { Router } from 'express';
-import createFolderController from '../modules/taskManager/folder/interfaces/controllers/folder.controller';
-import workspacePermissionMiddleware from '../modules/taskManager/workspace/infrastructure/workspacePermission';
-import workspaceMatchMiddleware from '../modules/taskManager/workspace/infrastructure/workspaceMatch';
-import { createAuthRequiredMiddelware } from '../modules/auth/infrastructure/middelwares/authRequired';
-import { SECRET_JWT_KEY } from '../config';
-import { validateSchema } from '../shared/middlewares/validateSchemaMiddleware';
+import createFolderController from '../modules/taskManager/folder/interfaces/controllers/folder.controller.js';
+import workspacePermissionMiddleware from '../modules/taskManager/workspace/infrastructure/middleware/workspacePermission.js';
+import workspaceMatchMiddleware from '../modules/taskManager/workspace/infrastructure/middleware/workspaceMatch.js';
+import { createAuthRequiredMiddelware } from '../modules/auth/infrastructure/middelwares/authRequired.js';
+import { SECRET_JWT_KEY } from '../config.js';
+import { validateSchema } from '../shared/middlewares/validateSchemaMiddleware.js';
 import {
 	createFolderInputSchema,
 	updateFolderInputSchema,
-} from '../modules/taskManager/folder/infrastructure/schemas/folder.schema';
+} from '../modules/taskManager/folder/infrastructure/schemas/folder.schema.js';
 
 export const createFolderRouter = Repository => {
 	const router = Router();
