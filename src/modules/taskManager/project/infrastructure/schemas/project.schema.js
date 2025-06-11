@@ -41,34 +41,35 @@ const projectCoreSchema = z.object({
 
 	icon: z
 		.string()
-		.max(100, 'El icono no puede exceder los 100 caracteres')
+		.max(4, 'El icono no puede exceder los 4 caracteres')
+		.default('1')
 		.optional(),
 
 	visibility: projectVisibilityEnum.default('public').optional(),
 
-	features_enabled: jsonVal.optional(),
-	automation_rules: jsonVal.optional(),
+	featuresEnabled: jsonVal.optional(),
+	automationRules: jsonVal.optional(),
 
-	estimated_hours: z
+	estimatedHours: z
 		.number()
 		.positive('Las horas estimadas deben ser un número positivo')
 		.optional(),
 
-	working_days: jsonVal.optional(),
-	working_hours: jsonVal.optional(),
+	workingDays: jsonVal.optional(),
+	workingHours: jsonVal.optional(),
 	holidays: jsonVal.optional(),
 	tags: jsonVal.optional(),
 	metadata: jsonVal.optional(),
 });
 
 export const createProjectInputSchema = projectCoreSchema.extend({
-	workspace_id: uuidSchema.nonempty(
+	workspaceId: uuidSchema.nonempty(
 		'El ID del workspace es requerido para crear un proyecto'
 	),
 });
 
 export const updateProjectInputSchema = projectCoreSchema.partial().extend({
-	updated_by: uuidSchema.optional(),
+	updatedBy: uuidSchema.optional(),
 });
 
 export const projectIdParamSchema = z.object({
@@ -81,10 +82,10 @@ export const projectWorkspaceIdParamSchema = z.object({
 
 export const projectEntitySchema = projectCoreSchema.extend({
 	id: uuidSchema,
-	workspace_id: uuidSchema,
-	created_at: z.string().datetime(),
-	created_by: uuidSchema,
-	updated_at: z.string().datetime(),
-	updated_by: uuidSchema.nullable(),
-	completed_at: z.string().datetime().nullable(),
+	workspaceId: uuidSchema,
+	createdAt: z.string().datetime(),
+	createdBy: uuidSchema,
+	updatedAt: z.string().datetime(),
+	updatedBy: uuidSchema.nullable(),
+	completedAt: z.string().datetime().nullable(),
 });

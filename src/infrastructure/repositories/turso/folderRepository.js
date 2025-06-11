@@ -1,5 +1,7 @@
 import { connect } from './connection.js';
 
+const RETURNING = `HEX(id) AS id, HEX(project_id) AS project_id,HEX(workspace_id) AS workspace_id,  name, description, color, icon, is_private, automation_rules, created_at, HEX(created_by) AS created_by, updated_at, HEX(updated_by) AS updated_by, metadata `;
+
 class FolderRepositoryClass {
 	constructor(connection) {
 		this.connection = connection;
@@ -8,22 +10,7 @@ class FolderRepositoryClass {
 	async getAll() {
 		try {
 			const { rows } = await this.connection.execute(
-				`SELECT 
-          HEX(id) AS id, 
-          HEX(project_id) AS project_id,
-          HEX(workspace_id) AS workspace_id,  
-          name, 
-          description, 
-          color, 
-          icon, 
-          position, 
-          is_private, 
-          automation_rules, 
-          created_at, 
-          HEX(created_by) AS created_by, 
-          updated_at, 
-          HEX(updated_by) AS updated_by, 
-          metadata 
+				`SELECT ${RETURNING} 
         FROM folders;`
 			);
 			return rows;
@@ -36,27 +23,12 @@ class FolderRepositoryClass {
 	async getById(id) {
 		try {
 			const { rows } = await this.connection.execute(
-				`SELECT 
-          HEX(id) AS id, 
-          HEX(project_id) AS project_id, 
-          HEX(workspace_id) AS workspace_id, 
-          name, 
-          description, 
-          color, 
-          icon, 
-          position, 
-          is_private, 
-          automation_rules, 
-          created_at, 
-          HEX(created_by) AS created_by, 
-          updated_at, 
-          HEX(updated_by) AS updated_by, 
-          metadata 
+				`SELECT ${RETURNING} 
         FROM folders 
         WHERE id = UNHEX(?);`,
 				[id]
 			);
-			return rows[0] || null;
+			return rows[0];
 		} catch (err) {
 			console.error('Error en FolderRepository.getById:', err);
 			throw err;
@@ -66,25 +38,9 @@ class FolderRepositoryClass {
 	async getByProjectId(projectId) {
 		try {
 			const { rows } = await this.connection.execute(
-				`SELECT 
-          HEX(id) AS id, 
-          HEX(project_id) AS project_id, 
-          HEX(workspace_id) AS workspace_id, 
-          name, 
-          description, 
-          color, 
-          icon, 
-          position, 
-          is_private, 
-          automation_rules, 
-          created_at, 
-          HEX(created_by) AS created_by, 
-          updated_at, 
-          HEX(updated_by) AS updated_by, 
-          metadata 
+				`SELECT ${RETURNING} 
         FROM folders 
-        WHERE project_id = UNHEX(?) 
-        ORDER BY position ASC;`,
+        WHERE project_id = UNHEX(?) ;`,
 				[projectId]
 			);
 			return rows;
@@ -102,7 +58,6 @@ class FolderRepositoryClass {
 		description = null,
 		color = '#808080',
 		icon = null,
-		position = 0,
 		isPrivate = false,
 		automationRules = null,
 		createdAt,
@@ -122,7 +77,6 @@ class FolderRepositoryClass {
           description, 
           color, 
           icon, 
-          position, 
           is_private, 
           automation_rules, 
           created_at, 
@@ -141,27 +95,11 @@ class FolderRepositoryClass {
           ?, 
           ?, 
           ?, 
-          ?, 
           UNHEX(?), 
           ?, 
           UNHEX(?), 
           ?
-        ) RETURNING 
-          HEX(id) AS id, 
-          HEX(project_id) AS project_id, 
-          HEX(workspace_id) AS workspace_id, 
-          name, 
-          description, 
-          color, 
-          icon, 
-          position, 
-          is_private, 
-          automation_rules, 
-          created_at, 
-          HEX(created_by) AS created_by, 
-          updated_at, 
-          HEX(updated_by) AS updated_by, 
-          metadata;`,
+        ) RETURNING ${RETURNING} ;`,
 				[
 					hexId,
 					projectId,
@@ -170,7 +108,6 @@ class FolderRepositoryClass {
 					description,
 					color,
 					icon,
-					position,
 					isPrivate,
 					JSON.stringify(automationRules),
 					createdAt,
@@ -191,9 +128,9 @@ class FolderRepositoryClass {
 		id,
 		name = null,
 		description = null,
+		projectId = null,
 		color = null,
 		icon = null,
-		position = null,
 		isPrivate = null,
 		automationRules = null,
 		updatedAt,
@@ -221,9 +158,9 @@ class FolderRepositoryClass {
 				updates.push('icon = ?');
 				values.push(icon);
 			}
-			if (position !== null) {
-				updates.push('position = ?');
-				values.push(position);
+			if (projectId !== null) {
+				updates.push('project_id = UNHEX(?)');
+				values.push(projectId);
 			}
 			if (isPrivate !== null) {
 				updates.push('is_private = ?');
@@ -247,31 +184,16 @@ class FolderRepositoryClass {
 			}
 
 			if (updates.length === 0) {
-				return null; // No hay nada que actualizar
+				return null;
 			}
 
-			values.push(id); // Para la condición WHERE id = UNHEX(?)
+			values.push(id);
 
 			const { rows } = await this.connection.execute(
 				`UPDATE folders 
          SET ${updates.join(', ')} 
          WHERE id = UNHEX(?) 
-         RETURNING 
-           HEX(id) AS id, 
-           HEX(project_id) AS project_id, 
-          HEX(workspace_id) AS workspace_id, 
-           name, 
-           description, 
-           color, 
-           icon, 
-           position, 
-           is_private, 
-           automation_rules, 
-           created_at, 
-           HEX(created_by) AS created_by, 
-           updated_at, 
-           HEX(updated_by) AS updated_by, 
-           metadata;`,
+         RETURNING ${RETURNING} ;`,
 				values
 			);
 			return rows[0] || null;

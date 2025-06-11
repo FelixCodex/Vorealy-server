@@ -1,3 +1,5 @@
+import { getDateNow } from '../../../../shared/utils/utils.js';
+
 export default function updateProject(projectRepository) {
 	return async function (id, projectData) {
 		try {
@@ -6,7 +8,7 @@ export default function updateProject(projectRepository) {
 				throw new Error(`Proyecto con ID ${id} no encontrado`);
 			}
 
-			projectData.updatedAt = new Date().toISOString();
+			projectData.updatedAt = getDateNow();
 
 			const updatedProject = await projectRepository.update({
 				id,

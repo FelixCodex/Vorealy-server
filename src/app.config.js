@@ -74,7 +74,14 @@ export function configurateApp(app) {
 		'/app',
 		createWorkspaceMemberRouter(WorkspaceRepository, WorkspaceMemberRepository)
 	);
-	app.use('/app', createProjectRouter(ProjectRepository));
+	app.use(
+		'/app',
+		createProjectRouter(
+			ProjectRepository,
+			WorkspaceRepository,
+			WorkspaceMemberRepository
+		)
+	);
 	app.use('/app', createNotificationRouter(NotificationRepository));
 	app.use(
 		'/app',
@@ -87,8 +94,25 @@ export function configurateApp(app) {
 			Notification_Service
 		)
 	);
-	app.use('/app', createFolderRouter(FolderRepository));
-	app.use('/app', createListRouter(ListRepository));
+	app.use(
+		'/app',
+		createFolderRouter(
+			FolderRepository,
+			ProjectRepository,
+			WorkspaceRepository,
+			WorkspaceMemberRepository
+		)
+	);
+	app.use(
+		'/app',
+		createListRouter(
+			ListRepository,
+			ProjectRepository,
+			FolderRepository,
+			WorkspaceRepository,
+			WorkspaceMemberRepository
+		)
+	);
 	app.use('/app', createTaskRouter(TaskRepository));
 	app.use('/app', createSubTaskRouter(SubTaskRepository));
 }

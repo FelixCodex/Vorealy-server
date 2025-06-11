@@ -22,9 +22,10 @@ CREATE TABLE workspaces (
 
 
 CREATE TABLE workspace_members (
+  id BINARY(16) PRIMARY KEY,
   workspace_id BINARY(16) NOT NULL,
   user_id BINARY(16) NOT NULL,
-  role ENUM('admin', 'member', 'guest') DEFAULT 'guest',
+  role TEXT CHECK( role IN ('admin', 'member', 'guest') ) DEFAULT 'guest',
   joined_at DATETIME NOT NULL,
   invited_by BINARY(16),
   PRIMARY KEY (workspace_id, user_id),
@@ -120,7 +121,7 @@ CREATE TABLE lists (
 
     assigned_to BINARY(16),
 
-    default_states JSON DEFAULT "[{ name: 'TODO', color: '#E74C3C' },{ name: 'Done', color: '#F39C12' }]",
+    default_states JSON DEFAULT "[{ 'name': 'TODO', 'color': '#E74C3C' },{ 'name': 'Done', 'color': '#F39C12' }]",
     statuses JSON,
 
     priority ENUM('low', 'normal', 'high', 'urgent') DEFAULT 'normal',
@@ -253,7 +254,7 @@ CREATE TABLE documents (
   id BINARY(16) PRIMARY KEY,
   title TEXT NOT NULL,
   content TEXT DEFAULT '',
-    workspace_id BINARY(16) NOT NULL,
+  workspace_id BINARY(16) NOT NULL,
   parent_type ENUM('project', 'folder', 'list') NOT NULL,
   parent_id BINARY(16),
   created_by BINARY(16),
@@ -302,29 +303,56 @@ CREATE TABLE form_submissions (
 
 
 
+
 CREATE TABLE notifications (
   id VARCHAR(12) PRIMARY KEY,
   recipient_id BINARY(16) NOT NULL, 
-  type ENUM('invitation', 'task', 'mention', 'update', 'custom') NOT NULL,
+  type TEXT CHECK( type IN ('invitation', 'task', 'mention', 'update', 'custom') ) NOT NULL,
   title TEXT NOT NULL,
   message TEXT,
   data JSON, 
   is_read BOOLEAN DEFAULT FALSE,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (recipient_id) REFERENCES users(id)
 );
+
+
+
+
+CREATE TABLE workspace_assignation (
+    id BINARY(16) PRIMARY KEY,
+    user_id BINARY(16) NOT NULL,
+    workspace_id BINARY(16) NOT NULL,
+    parent_type TEXT CHECK( parent_type IN ('project', 'folder', 'list', 'task', 'subtask') ) NOT NULL,
+    parent_id BINARY(16) NOT NULL,
+    assigned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    assigned_by BINARY(16),
+    
+    UNIQUE(user_id, workspace_id, parent_type, parent_id),
+    
+    FOREIGN KEY (assigned_by) REFERENCES users(id) ON DELETE SET NULL,
+    FOREIGN KEY (workspace_id) REFERENCES workspaces(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id, workspace_id) REFERENCES workspace_members(user_id, workspace_id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_workspace_assignation_workspace ON workspace_assignation(workspace_id);
+CREATE INDEX idx_workspace_assignation_user ON workspace_assignation(user_id);
+CREATE INDEX idx_workspace_assignation_parent ON workspace_assignation(parent_type, parent_id);
+CREATE INDEX idx_workspace_assignation_assigned_by ON workspace_assignation(assigned_by);
+
 
 CREATE TABLE workspace_invitations (
   id VARCHAR(12) PRIMARY KEY,
   workspace_id BINARY(16) NOT NULL,
   invited_user_id BINARY(16) NOT NULL,
   invited_by_user_id BINARY(16) NOT NULL,     
-  status ENUM('pending', 'accepted') DEFAULT 'pending',
+  status TEXT CHECK( status IN ('pending', 'accepted') ) DEFAULT 'pending',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   responded_at TIMESTAMP NULL,
   expires_at TIMESTAMP,                 
-  role ENUM('admin', 'member', 'guest') DEFAULT 'member',
-  message TEXT NULL,                            
+  role TEXT CHECK( role IN ('admin', 'member', 'guest') ) DEFAULT 'member',
+  message TEXT DEFAULT NULL,                            
   FOREIGN KEY (workspace_id) REFERENCES workspaces(id) ON DELETE CASCADE,
   FOREIGN KEY (invited_user_id) REFERENCES users(id) ON DELETE CASCADE,
   FOREIGN KEY (invited_by_user_id) REFERENCES users(id) ON DELETE SET NULL

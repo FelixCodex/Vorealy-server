@@ -56,7 +56,7 @@ class WorkspaceInvitationRepositoryClass {
 		try {
 			const { rows } = await this.connection.execute(
 				`SELECT * FROM workspace_invitations
-			WHERE invited_user_id = ?
+			WHERE invited_user_id = UNHEX(?)
 			AND status = ?
 			ORDER BY created_at DESC`,
 				[userId, status]

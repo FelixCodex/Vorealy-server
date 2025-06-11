@@ -1,33 +1,33 @@
-class Folder {
+export class Folder {
 	constructor(
 		id,
-		project_id,
-		workspace_id,
+		projectId,
+		workspaceId,
 		name,
 		description,
 		color,
 		icon,
-		is_private = false,
-		automation_rules,
-		created_at = new Date(),
-		created_by,
-		updated_at = new Date(),
-		updated_by,
+		isPrivate = false,
+		automationRules,
+		createdAt = new Date(),
+		createdBy,
+		updatedAt = new Date(),
+		updatedBy,
 		metadata
 	) {
 		this.id = id;
-		this.project_id = project_id;
-		this.workspace_id = workspace_id;
+		this.projectId = projectId;
+		this.workspaceId = workspaceId;
 		this.name = name;
 		this.description = description;
 		this.color = color;
 		this.icon = icon;
-		this.is_private = is_private;
-		this.automation_rules = automation_rules;
-		this.created_at = created_at;
-		this.created_by = created_by;
-		this.updated_at = updated_at;
-		this.updated_by = updated_by;
+		this.isPrivate = isPrivate;
+		this.automationRules = automationRules;
+		this.createdAt = createdAt;
+		this.createdBy = createdBy;
+		this.updatedAt = updatedAt;
+		this.updatedBy = updatedBy;
 		this.metadata = metadata;
 	}
 }

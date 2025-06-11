@@ -89,8 +89,7 @@ export default function createWorkspaceMemberController(workspaceMemberRepo) {
 
 		async updateRole(req, res) {
 			try {
-				const { workspaceId, userId } = req.params;
-				const { role } = req.body;
+				const { workspaceId, userId, role } = req.params;
 
 				const member = await updateWSMemberRoleUseCase(
 					workspaceId,

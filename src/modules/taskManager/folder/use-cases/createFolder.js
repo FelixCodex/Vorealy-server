@@ -1,49 +1,48 @@
 import crypto from 'node:crypto';
-export default function createFolder(folderRepository) {
-	return async function (folderData) {
+import { Folder } from '../domain/entity/Folder.js';
+import { getDateNow } from '../../../../shared/utils/utils.js';
+export default function createFolder(folderRepository, projectRepository) {
+	return async function ({
+		projectId,
+		workspaceId,
+		name,
+		description,
+		color,
+		icon,
+		isPrivate,
+		automationRules,
+		createdBy,
+		updatedBy,
+		metadata,
+	}) {
 		try {
-			if (!folderData.name || !folderData.projectId) {
+			if (!name || !projectId) {
 				throw new Error(
 					'El nombre de la carpeta y el ID del proyecto son obligatorios'
 				);
 			}
 
-			if (!folderData.createdAt) {
-				folderData.createdAt = new Date().toISOString();
-			}
-			if (!folderData.updatedAt) {
-				folderData.updatedAt = folderData.createdAt;
+			const project = await projectRepository.getById(projectId);
+
+			if (!project) {
+				throw new Error('Proyecto no encontrado');
 			}
 
-			const {
-				project_id,
-				workspace_id,
-				name,
-				description,
-				color,
-				icon,
-				is_private,
-				automation_rules,
-				created_by,
-				updated_by,
-				metadata,
-			} = folderData;
-
-			const now = new Date().toISOString();
+			const now = getDateNow();
 			const folder = new Folder(
 				crypto.randomUUID(),
-				project_id,
-				workspace_id,
+				projectId,
+				workspaceId,
 				name,
 				description,
 				color,
 				icon,
-				is_private,
-				automation_rules,
+				isPrivate,
+				automationRules,
 				now,
-				created_by,
+				createdBy,
 				now,
-				updated_by,
+				updatedBy,
 				metadata
 			);
 

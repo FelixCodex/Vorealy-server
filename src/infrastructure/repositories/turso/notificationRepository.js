@@ -14,7 +14,6 @@ class NotificationRepositoryClass {
 		data,
 	}) {
 		try {
-			console.log({ id, recipientId, type, title, message, data });
 			const { rows } = await this.connection.execute(
 				`INSERT INTO notifications 
             (id, recipient_id, type, title, message, data) 

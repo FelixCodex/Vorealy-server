@@ -26,22 +26,18 @@ export const createWorkspaceInvitationRouter = (
 	});
 	const authRequired = createAuthRequiredMiddelware(SECRET_JWT_KEY);
 
-	router.get(
-		'/invitations',
-		authRequired,
-		workspaceInvitationController.getByUser
-	);
+	router.use(authRequired);
+
+	router.get('/invitations', workspaceInvitationController.getByUser);
 
 	router.post(
 		'/workspaces/:workspaceId/invite/:userEmail',
-		authRequired,
 		workspacePermissionMiddleware(memberRepo, ['admin'], workspaceRepo),
 		workspaceInvitationController.create
 	);
 
 	router.put(
 		'/invitations/accept/:invitationId',
-		authRequired,
 		workspaceInvitationController.acceptInvitation
 	);
 

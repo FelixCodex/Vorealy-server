@@ -40,9 +40,8 @@ export const createWorkspaceMemberRouter = (WorkspaceRepo, MemberRepo) => {
 	);
 
 	router.put(
-		'/workspaces/:workspaceId/members/:userId',
+		'/workspaces/:workspaceId/members/:userId/role/:role',
 		authRequired,
-		validateSchema(updateWorkspaceMemberRoleInputSchema),
 		workspacePermissionMiddleware(MemberRepo, ['admin'], WorkspaceRepo),
 		workspaceMemberController.updateRole
 	);

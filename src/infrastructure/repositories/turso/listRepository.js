@@ -1,5 +1,7 @@
 import { connect } from './connection.js';
 
+const RETURNING = `HEX(id) AS id, name, color,description, HEX(parent_id) AS parent_id,HEX(workspace_id) AS workspace_id,  parent_type, HEX(created_by) AS created_by, created_at, updated_at, automation_rules, HEX(assigned_to) AS assigned_to, default_states, statuses, priority, is_private, estimated_time`;
+
 class ListRepositoryClass {
 	constructor(connection) {
 		this.connection = connection;
@@ -8,26 +10,7 @@ class ListRepositoryClass {
 	async getAll() {
 		try {
 			const { rows } = await this.connection.execute(
-				`SELECT 
-          HEX(id) AS id, 
-          name, 
-          color,
-          description, 
-          HEX(parent_id) AS parent_id,
-          HEX(workspace_id) AS workspace_id,  
-          parent_type, 
-          HEX(created_by) AS created_by, 
-          created_at, 
-          updated_at, 
-          automation_rules, 
-          HEX(assigned_to) AS assigned_to, 
-          default_states, 
-          statuses, 
-          priority, 
-          is_private, 
-          estimated_time, 
-          position 
-        FROM lists;`
+				`SELECT ${RETURNING} FROM lists;`
 			);
 			return rows;
 		} catch (err) {
@@ -39,27 +22,9 @@ class ListRepositoryClass {
 	async getById(id) {
 		try {
 			const { rows } = await this.connection.execute(
-				`SELECT 
-          HEX(id) AS id, 
-          name, 
-          color,
-          description, 
-          HEX(parent_id) AS parent_id, 
-          HEX(workspace_id) AS workspace_id, 
-          parent_type, 
-          HEX(created_by) AS created_by, 
-          created_at, 
-          updated_at, 
-          automation_rules, 
-          HEX(assigned_to) AS assigned_to, 
-          default_states, 
-          statuses, 
-          priority, 
-          is_private, 
-          estimated_time, 
-          position 
-        FROM lists 
-        WHERE id = UNHEX(?);`,
+				`SELECT ${RETURNING}
+        		FROM lists 
+        		WHERE id = UNHEX(?);`,
 				[id]
 			);
 			return rows[0] || null;
@@ -72,28 +37,9 @@ class ListRepositoryClass {
 	async getByParent(parentId, parentType) {
 		try {
 			const { rows } = await this.connection.execute(
-				`SELECT 
-          HEX(id) AS id, 
-          name, 
-          color,
-          description, 
-          HEX(parent_id) AS parent_id, 
-          HEX(workspace_id) AS workspace_id, 
-          parent_type, 
-          HEX(created_by) AS created_by, 
-          created_at, 
-          updated_at, 
-          automation_rules, 
-          HEX(assigned_to) AS assigned_to, 
-          default_states, 
-          statuses, 
-          priority, 
-          is_private, 
-          estimated_time, 
-          position 
-        FROM lists 
-        WHERE parent_id = UNHEX(?) AND parent_type = ? 
-        ORDER BY position ASC;`,
+				`SELECT ${RETURNING}
+        		FROM lists 
+        		WHERE parent_id = UNHEX(?) AND parent_type = ?;`,
 				[parentId, parentType]
 			);
 			return rows;
@@ -143,8 +89,7 @@ class ListRepositoryClass {
           statuses, 
           priority, 
           is_private, 
-          estimated_time, 
-          position
+          estimated_time
         ) VALUES(
           UNHEX(?), 
           ?, 
@@ -161,26 +106,9 @@ class ListRepositoryClass {
           ?, 
           ?, 
           ?, 
-          ?, 
-          ?
-        ) RETURNING 
-          HEX(id) AS id, 
-          name, 
-          color,
-          description, 
-          HEX(parent_id) AS parent_id, 
-          HEX(workspace_id) AS workspace_id, 
-          parent_type, 
-          HEX(created_by) AS created_by, 
-          created_at, 
-          updated_at, 
-          automation_rules, 
-          HEX(assigned_to) AS assigned_to, 
-          default_states, 
-          statuses, 
-          priority, 
-          is_private, 
-          estimated_time;`,
+          ?,
+		  ?
+        ) RETURNING ${RETURNING};`,
 				[
 					hexId,
 					name,
@@ -279,26 +207,9 @@ class ListRepositoryClass {
 
 			const { rows } = await this.connection.execute(
 				`UPDATE lists 
-         SET ${updates.join(', ')} 
-         WHERE id = UNHEX(?) 
-         RETURNING 
-           HEX(id) AS id, 
-           name, 
-           color,
-           description, 
-           HEX(parent_id) AS parent_id, 
-          HEX(workspace_id) AS workspace_id, 
-           parent_type, 
-           HEX(created_by) AS created_by, 
-           created_at, 
-           updated_at, 
-           automation_rules, 
-           HEX(assigned_to) AS assigned_to, 
-           default_states, 
-           statuses, 
-           priority, 
-           is_private, 
-           estimated_time;`,
+         		SET ${updates.join(', ')} 
+         		WHERE id = UNHEX(?) 
+         		RETURNING ${RETURNING};`,
 				values
 			);
 			return rows[0] || null;
@@ -308,34 +219,16 @@ class ListRepositoryClass {
 		}
 	}
 
-	async changeParent({ id, parentId, parentType }) {
+	async changeParent({ id, parentId, parentType, now }) {
 		try {
 			if (['project', 'folder'].includes(parentType)) {
 			}
 
-			const now = new Date().toISOString();
 			const { rows } = await this.connection.execute(
 				`UPDATE lists 
-         SET parent_id = ?, parent_type = ?, updated_at = ?
+         SET parent_id = UNHEX(?), parent_type = ?, updated_at = ?
          WHERE id = UNHEX(?) 
-         RETURNING 
-           HEX(id) AS id, 
-           name, 
-           color,
-           description, 
-           HEX(parent_id) AS parent_id, 
-          HEX(workspace_id) AS workspace_id, 
-           parent_type, 
-           HEX(created_by) AS created_by, 
-           created_at, 
-           updated_at, 
-           automation_rules, 
-           HEX(assigned_to) AS assigned_to, 
-           default_states, 
-           statuses, 
-           priority, 
-           is_private, 
-           estimated_time;`,
+         RETURNING ${RETURNING};`,
 				[parentId, parentType, now, id]
 			);
 			return rows[0] || null;

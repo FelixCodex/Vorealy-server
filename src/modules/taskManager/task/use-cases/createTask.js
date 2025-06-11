@@ -1,6 +1,6 @@
 import crypto from 'node:crypto';
 import { getDateNow } from '../../../../shared/utils/utils.js';
-import { List } from '../domain/entity/Task.js';
+import { Task } from '../domain/entity/Task.js';
 export default function createTask(taskRepository) {
 	return async function (taskData) {
 		try {
@@ -15,7 +15,7 @@ export default function createTask(taskRepository) {
 
 			const now = getDateNow();
 
-			const list = new List(
+			const task = new Task(
 				crypto.randomUUID(),
 				taskData.title,
 				taskData.list_id,
@@ -31,7 +31,7 @@ export default function createTask(taskRepository) {
 				taskData.estimated_time
 			);
 
-			return await taskRepository.create(list);
+			return await taskRepository.create(task);
 		} catch (error) {
 			throw new Error(`Error al crear tarea: ${error.message}`);
 		}

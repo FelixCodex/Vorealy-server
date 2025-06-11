@@ -3,6 +3,7 @@ import {
 	listParentParamsSchema,
 	workspaceIdParamSchema,
 } from '../../infrastructure/schemas/list.schema.js';
+import changeParent from '../../use-cases/changeParent.js';
 import createList from '../../use-cases/createList.js';
 import deleteList from '../../use-cases/deleteList.js';
 import deleteListsByParent from '../../use-cases/deleteListsByParent.js';
@@ -11,14 +12,31 @@ import getListById from '../../use-cases/getListById.js';
 import getListsByParent from '../../use-cases/getListsByParent.js';
 import updateList from '../../use-cases/updateList.js';
 
-export default function createListController(listRepository) {
+export default function createListController(
+	listRepository,
+	projectRepository,
+	folderRepository
+) {
 	const getAllListsUseCase = getAllLists(listRepository);
 	const getListByIdUseCase = getListById(listRepository);
 	const getListsByParentUseCase = getListsByParent(listRepository);
-	const createListUseCase = createList(listRepository);
-	const updateListUseCase = updateList(listRepository);
+	const createListUseCase = createList(
+		listRepository,
+		projectRepository,
+		folderRepository
+	);
+	const updateListUseCase = updateList(
+		listRepository,
+		projectRepository,
+		folderRepository
+	);
 	const deleteListUseCase = deleteList(listRepository);
 	const deleteListsByParentUseCase = deleteListsByParent(listRepository);
+	const changeParentUseCase = changeParent(
+		listRepository,
+		projectRepository,
+		folderRepository
+	);
 
 	return {
 		async getAllLists(req, res) {
@@ -126,6 +144,37 @@ export default function createListController(listRepository) {
 				return res.status(400).json({
 					success: false,
 					message: error.message || 'Error al actualizar lista',
+				});
+			}
+		},
+
+		async changeListParent(req, res) {
+			try {
+				const { id } = listIdParamSchema.parse(req.params);
+				const { workspaceId } = workspaceIdParamSchema.parse(req.params);
+				const { parentId, parentType } = req.body;
+
+				const updatedList = await changeParentUseCase(
+					id,
+					parentId,
+					parentType,
+					workspaceId
+				);
+				return res.status(200).json({
+					success: true,
+					data: updatedList,
+					message: 'Padre de la Lista actualizado exitosamente',
+				});
+			} catch (error) {
+				if (error.message.includes('no encontrada')) {
+					return res.status(404).json({
+						success: false,
+						message: error.message,
+					});
+				}
+				return res.status(400).json({
+					success: false,
+					message: error.message || 'Error al actualizar el padre de la lista',
 				});
 			}
 		},

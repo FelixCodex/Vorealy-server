@@ -40,6 +40,7 @@ export const folderIdParamSchema = z.object({
 
 export const projectIdParamSchema = z.object({
 	projectId: uuidSchema.nonempty('El ID del proyecto es requerido'),
+	workspaceId: uuidSchema.nonempty('El ID del workspace es requerido'),
 });
 
 export const workspaceIdParamSchema = z.object({

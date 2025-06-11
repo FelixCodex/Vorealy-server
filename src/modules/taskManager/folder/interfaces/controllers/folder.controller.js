@@ -10,12 +10,18 @@ import getFolderById from '../../use-cases/getFolderById.js';
 import getFoldersByProjectId from '../../use-cases/getFoldersByProjectId.js';
 import updateFolder from '../../use-cases/updateFolder.js';
 
-export default function createFolderController(folderRepository) {
+export default function createFolderController(
+	folderRepository,
+	projectRepository
+) {
 	const getAllFoldersUseCase = getAllFolders(folderRepository);
 	const getFolderByIdUseCase = getFolderById(folderRepository);
-	const getFoldersByProjectIdUseCase = getFoldersByProjectId(folderRepository);
-	const updateFolderUseCase = updateFolder(folderRepository);
-	const createFolderUseCase = createFolder(folderRepository);
+	const getFoldersByProjectIdUseCase = getFoldersByProjectId(
+		folderRepository,
+		projectRepository
+	);
+	const updateFolderUseCase = updateFolder(folderRepository, projectRepository);
+	const createFolderUseCase = createFolder(folderRepository, projectRepository);
 	const deleteFolderUseCase = deleteFolder(folderRepository);
 	const deleteFoldersByProjectIdUseCase =
 		deleteFoldersByProjectId(folderRepository);
@@ -61,7 +67,9 @@ export default function createFolderController(folderRepository) {
 
 		async getFoldersByProjectId(req, res) {
 			try {
-				const { projectId } = projectIdParamSchema.parse(req.params);
+				const { projectId, workspaceId } = projectIdParamSchema.parse(
+					req.params
+				);
 				if (!projectId) {
 					return res.status(400).json({
 						success: false,
@@ -69,7 +77,10 @@ export default function createFolderController(folderRepository) {
 					});
 				}
 
-				const folders = await getFoldersByProjectIdUseCase(projectId);
+				const folders = await getFoldersByProjectIdUseCase(
+					projectId,
+					workspaceId
+				);
 				return res.status(200).json({ success: true, data: folders });
 			} catch (error) {
 				return res.status(500).json({
@@ -108,14 +119,18 @@ export default function createFolderController(folderRepository) {
 
 		async updateFolder(req, res) {
 			try {
-				const { id } = req.params;
+				const { id, workspaceId } = req.params;
 				const folderData = req.body;
 
 				if (req.user && req.user.id) {
 					folderData.updatedBy = req.user.id;
 				}
 
-				const updatedFolder = await updateFolderUseCase(id, folderData);
+				const updatedFolder = await updateFolderUseCase(
+					id,
+					workspaceId,
+					folderData
+				);
 				return res.status(200).json({
 					success: true,
 					data: updatedFolder,

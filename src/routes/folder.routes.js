@@ -10,60 +10,82 @@ import {
 	updateFolderInputSchema,
 } from '../modules/taskManager/folder/infrastructure/schemas/folder.schema.js';
 
-export const createFolderRouter = Repository => {
+export const createFolderRouter = (
+	Repository,
+	projectRepo,
+	workspaceRepo,
+	memberRepo
+) => {
 	const router = Router();
 
-	const folderController = createFolderController(Repository);
+	const folderController = createFolderController(Repository, projectRepo);
 	const authRequired = createAuthRequiredMiddelware(SECRET_JWT_KEY);
-
-	// router.get(
-	// 	'/folders',
-	// 	authRequired,
-	// 	workspacePermissionMiddleware(['admin', 'member']),
-	// 	folderController.getAllFolders
-	// );
 
 	router.use(authRequired);
 
 	router.get(
 		'/workspaces/:workspaceId/folders/:id',
-		workspacePermissionMiddleware(['admin', 'member']),
+		workspacePermissionMiddleware(
+			memberRepo,
+			['admin', 'member'],
+			workspaceRepo
+		),
 		workspaceMatchMiddleware(Repository),
 		folderController.getFolderById
 	);
 
 	router.get(
 		'/workspaces/:workspaceId/folders/project/:projectId',
-		workspacePermissionMiddleware(['admin', 'member']),
+		workspacePermissionMiddleware(
+			memberRepo,
+			['admin', 'member'],
+			workspaceRepo
+		),
 		workspaceMatchMiddleware(Repository, 'projectId', 'getByProjectId'),
 		folderController.getFoldersByProjectId
 	);
 
 	router.post(
-		'/workspace/:workspaceId/folders',
+		'/workspaces/:workspaceId/folders',
 		validateSchema(createFolderInputSchema),
-		workspacePermissionMiddleware(['admin', 'member']),
+		workspacePermissionMiddleware(
+			memberRepo,
+			['admin', 'member'],
+			workspaceRepo
+		),
 		folderController.createFolder
 	);
 
 	router.put(
-		'/workspace/:workspaceId/folders/:id',
+		'/workspaces/:workspaceId/folders/:id',
 		validateSchema(updateFolderInputSchema),
-		workspacePermissionMiddleware(['admin', 'member']),
+		workspacePermissionMiddleware(
+			memberRepo,
+			['admin', 'member'],
+			workspaceRepo
+		),
 		workspaceMatchMiddleware(Repository),
 		folderController.updateFolder
 	);
 
 	router.delete(
-		'/workspace/:workspaceId/folders/:id',
-		workspacePermissionMiddleware(['admin', 'member']),
+		'/workspaces/:workspaceId/folders/:id',
+		workspacePermissionMiddleware(
+			memberRepo,
+			['admin', 'member'],
+			workspaceRepo
+		),
 		workspaceMatchMiddleware(Repository),
 		folderController.deleteFolder
 	);
 
 	router.delete(
-		'/workspace/:workspaceId/folders/project/:projectId',
-		workspacePermissionMiddleware(['admin', 'member']),
+		'/workspaces/:workspaceId/folders/project/:projectId',
+		workspacePermissionMiddleware(
+			memberRepo,
+			['admin', 'member'],
+			workspaceRepo
+		),
 		workspaceMatchMiddleware(Repository, 'projectId', 'getByProjectId'),
 		folderController.deleteFoldersByProjectId
 	);

@@ -38,14 +38,14 @@ const listCoreSchema = z.object({
 
 	description: z.string().optional(),
 
-	automation_rules: z.any().optional(),
+	automationRules: z.any().optional(),
 
-	assigned_to: z.array(uuidSchema).optional(),
+	assignedTo: z.array(uuidSchema).optional(),
 
 	statuses: z.any().optional(),
 	priority: listPriorityEnum.default('normal').optional(),
-	is_private: z.boolean().default(false).optional(),
-	estimated_time: z
+	isPrivate: z.boolean().default(false).optional(),
+	estimatedTime: z
 		.number()
 		.int('El tiempo estimado debe ser un número entero')
 		.positive('El tiempo estimado debe ser positivo')
@@ -53,18 +53,23 @@ const listCoreSchema = z.object({
 });
 
 export const createListInputSchema = listCoreSchema.extend({
-	parent_id: uuidSchema.nonempty(
+	parentId: uuidSchema.nonempty(
 		'El ID del padre es requerido para crear una lista'
 	),
-	parent_type: listParentTypeEnum,
-	workspace_id: uuidSchema.nonempty('El ID del workspace es requerido'),
-	created_by: uuidSchema.optional(),
+	parentType: listParentTypeEnum,
+	workspaceId: uuidSchema.nonempty('El ID del workspace es requerido'),
+	createdBy: uuidSchema.optional(),
 });
 
 export const updateListInputSchema = listCoreSchema.partial();
 
 export const listIdParamSchema = z.object({
 	id: uuidSchema.nonempty('El ID de la lista es requerido'),
+});
+
+export const listParentInputSchema = z.object({
+	parentId: uuidSchema.nonempty('El ID del padre es requerido'),
+	parentType: listParentTypeEnum,
 });
 
 export const listParentParamsSchema = z.object({
@@ -78,11 +83,11 @@ export const workspaceIdParamSchema = z.object({
 
 export const listEntitySchema = listCoreSchema.extend({
 	id: uuidSchema,
-	parent_id: uuidSchema,
-	parent_type: listParentTypeEnum,
-	workspace_id: uuidSchema,
-	created_by: uuidSchema.nullable(),
-	created_at: z.string().datetime(),
+	parentId: uuidSchema,
+	parentType: listParentTypeEnum,
+	workspaceId: uuidSchema,
+	createdBy: uuidSchema.nullable(),
+	createdAt: z.string().datetime(),
 	statuses: z.array(listStatusSchema).optional(),
-	assigned_to: z.array(uuidSchema).optional(),
+	assignedTo: z.array(uuidSchema).optional(),
 });

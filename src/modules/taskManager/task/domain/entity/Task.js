@@ -1,4 +1,4 @@
-export class List {
+export class Task {
 	constructor(
 		id,
 		title,
