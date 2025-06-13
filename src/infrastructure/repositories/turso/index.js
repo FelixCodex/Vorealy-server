@@ -13,4 +13,5 @@ export { default as WorkspaceMemberRepository } from './workspaceMemberRepositor
 export { default as WorkspaceRepository } from './workspaceRepository.js';
 export { default as WorkspaceInvitationRepository } from './workspaceInvitationRepository.js';
 export { default as NotificationRepository } from './notificationRepository.js';
+export { default as ChatRepository } from './chatRepository.js';
 export { connect } from './connection.js';

@@ -121,7 +121,7 @@ CREATE TABLE lists (
 
     assigned_to BINARY(16),
 
-    default_states JSON DEFAULT "[{ 'name': 'TODO', 'color': '#E74C3C' },{ 'name': 'Done', 'color': '#F39C12' }]",
+    default_states JSON DEFAULT "{'todo':{'name':'Todo','color':'#E74C3C'},'done':{'name':'Done','color':'#F39C12'}}",
     statuses JSON,
 
     priority ENUM('low', 'normal', 'high', 'urgent') DEFAULT 'normal',
@@ -356,4 +356,59 @@ CREATE TABLE workspace_invitations (
   FOREIGN KEY (workspace_id) REFERENCES workspaces(id) ON DELETE CASCADE,
   FOREIGN KEY (invited_user_id) REFERENCES users(id) ON DELETE CASCADE,
   FOREIGN KEY (invited_by_user_id) REFERENCES users(id) ON DELETE SET NULL
+);
+
+
+
+
+
+
+
+
+CREATE TABLE chat_conversations (
+  id VARCHAR(36) PRIMARY KEY,
+  workspace_id BINARY(16) NOT NULL,
+  parent_id BINARY(16) NOT NULL,
+  parent_type TEXT CHECK( parent_type IN ('project', 'folder', 'list') ) NOT NULL,
+  name VARCHAR(255),
+  description TEXT,
+  type TEXT CHECK( type IN ('group', 'ai', 'direct') ) DEFAULT 'group',
+  is_active BOOLEAN DEFAULT TRUE,
+  created_by BINARY(16) NOT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+  FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (workspace_id) REFERENCES workspaces(id) ON DELETE CASCADE,
+  
+  INDEX idx_parent (parent_id, parent_type),
+  INDEX idx_created_by (created_by),
+  INDEX idx_active (is_active),
+  INDEX idx_type (type)
+);
+
+
+CREATE TABLE chat_messages (
+  id VARCHAR(36) PRIMARY KEY,
+  conversation_id VARCHAR(36) NOT NULL,
+  sender_id BINARY(16), 
+  sender_type TEXT CHECK( sender_type IN ('user', 'ai') ) DEFAULT 'user',
+  message TEXT NOT NULL,
+  metadata JSON, 
+  is_edited BOOLEAN DEFAULT FALSE,
+  edited_at DATETIME NULL,
+  reply_to_id VARCHAR(36) NULL, 
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+
+  FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE,
+  
+  FOREIGN KEY (conversation_id) REFERENCES chat_conversations(id) ON DELETE CASCADE,
+  FOREIGN KEY (reply_to_id) REFERENCES chat_messages(id) ON DELETE SET NULL,
+  
+  INDEX idx_conversation (conversation_id),
+  INDEX idx_sender (sender_id),
+  INDEX idx_sender_type (sender_type),
+  INDEX idx_created_at (created_at),
+  INDEX idx_reply_to (reply_to_id)
 );

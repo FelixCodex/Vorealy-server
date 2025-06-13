@@ -13,6 +13,7 @@ import {
 	SubTaskRepository,
 	WorkspaceInvitationRepository,
 	NotificationRepository,
+	ChatRepository,
 } from './infrastructure/repositories/turso/index.js';
 import { createGoogleAuthRouter } from './routes/authGoogle.routes.js';
 import { createWorkspaceRouter } from './routes/workspace.routes.js';
@@ -30,6 +31,7 @@ import { createWorkspaceInvitationRouter } from './routes/workspaceInvitation.ro
 import { WorkspaceMemberService } from './modules/taskManager/workspace/interfaces/services/workspaceMember.service.js';
 import { NotificationService } from './modules/notifications/interfaces/services/notification.service.js';
 import { createNotificationRouter } from './routes/notification.routes.js';
+import { createChatRouter } from './routes/chat.routes.js';
 
 // -----------------------------------
 
@@ -83,6 +85,17 @@ export function configurateApp(app) {
 		)
 	);
 	app.use('/app', createNotificationRouter(NotificationRepository));
+	app.use(
+		'/app',
+		createChatRouter(
+			ChatRepository,
+			WorkspaceRepository,
+			WorkspaceMemberRepository,
+			ProjectRepository,
+			FolderRepository,
+			ListRepository
+		)
+	);
 	app.use(
 		'/app',
 		createWorkspaceInvitationRouter(

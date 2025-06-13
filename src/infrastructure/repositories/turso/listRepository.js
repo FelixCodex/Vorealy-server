@@ -12,7 +12,9 @@ class ListRepositoryClass {
 			const { rows } = await this.connection.execute(
 				`SELECT ${RETURNING} FROM lists;`
 			);
-			return rows;
+			return rows.map(row => {
+				return { ...row, statuses: JSON.parse(row.statuses) };
+			});
 		} catch (err) {
 			console.error('Error en ListRepository.getAll:', err);
 			throw err;
@@ -27,7 +29,10 @@ class ListRepositoryClass {
         		WHERE id = UNHEX(?);`,
 				[id]
 			);
-			return rows[0] || null;
+			const row = rows[0]
+				? { ...rows[0], statuses: JSON.parse(rows[0].statuses) }
+				: null;
+			return row;
 		} catch (err) {
 			console.error('Error en ListRepository.getById:', err);
 			throw err;
@@ -42,7 +47,9 @@ class ListRepositoryClass {
         		WHERE parent_id = UNHEX(?) AND parent_type = ?;`,
 				[parentId, parentType]
 			);
-			return rows;
+			return rows.map(row => {
+				return { ...row, statuses: JSON.parse(row.statuses) };
+			});
 		} catch (err) {
 			console.error('Error en ListRepository.getByParent:', err);
 			throw err;
@@ -129,7 +136,7 @@ class ListRepositoryClass {
 					estimatedTime,
 				]
 			);
-			return rows[0];
+			return { ...rows[0], statuses: JSON.parse(rows[0].statuses) };
 		} catch (err) {
 			console.error('Error en ListRepository.create:', err);
 			throw err;
@@ -212,7 +219,10 @@ class ListRepositoryClass {
          		RETURNING ${RETURNING};`,
 				values
 			);
-			return rows[0] || null;
+			const row = rows[0]
+				? { ...rows[0], statuses: JSON.parse(rows[0].statuses) }
+				: null;
+			return row;
 		} catch (err) {
 			console.error('Error en ListRepository.update:', err);
 			throw err;
@@ -231,7 +241,10 @@ class ListRepositoryClass {
          RETURNING ${RETURNING};`,
 				[parentId, parentType, now, id]
 			);
-			return rows[0] || null;
+			const row = rows[0]
+				? { ...rows[0], statuses: JSON.parse(rows[0].statuses) }
+				: null;
+			return row;
 		} catch (err) {
 			console.error('Error en ListRepository.update:', err);
 			throw err;
