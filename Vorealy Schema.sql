@@ -22,7 +22,7 @@ CREATE TABLE workspaces (
 
 
 CREATE TABLE workspace_members (
-  id BINARY(16) PRIMARY KEY,
+  id BINARY(16) UNIQUE,
   workspace_id BINARY(16) NOT NULL,
   user_id BINARY(16) NOT NULL,
   role TEXT CHECK( role IN ('admin', 'member', 'guest') ) DEFAULT 'guest',
@@ -44,7 +44,7 @@ CREATE TABLE projects (
   color VARCHAR(7) DEFAULT '#4169E1',
   icon VARCHAR(100),
   
-  visibility ENUM('public', 'private') DEFAULT 'public',
+  visibility TEXT CHECK( visibility IN ('public', 'private') ) DEFAULT 'public',
 
   features_enabled JSON,
   automation_rules JSON,  
@@ -106,11 +106,11 @@ CREATE TABLE folders (
 CREATE TABLE lists (
     id BINARY(16) PRIMARY KEY,
     name TEXT NOT NULL,
-    color VARCHAR(7) DEFAULT '#808080'
+    color VARCHAR(7) DEFAULT '#808080',
     description TEXT,
 
     parent_id BINARY(16) NOT NULL,
-    parent_type ENUM('project', 'folder') NOT NULL,
+    parent_type TEXT CHECK( parent_type IN ('project', 'folder') ) NOT NULL,
     workspace_id BINARY(16) NOT NULL,
 
     created_by BINARY(16),
@@ -121,10 +121,10 @@ CREATE TABLE lists (
 
     assigned_to BINARY(16),
 
-    default_states JSON DEFAULT "{'todo':{'name':'Todo','color':'#E74C3C'},'done':{'name':'Done','color':'#F39C12'}}",
+    default_states JSON DEFAULT "[{ name: 'TODO', color: '#E74C3C' },{ name: 'Done', color: '#F39C12' }]",
     statuses JSON,
 
-    priority ENUM('low', 'normal', 'high', 'urgent') DEFAULT 'normal',
+    priority TEXT CHECK( priority IN ('low', 'normal', 'high', 'urgent') ) DEFAULT 'normal',
     is_private BOOLEAN DEFAULT FALSE,
 
     estimated_time INTEGER,
@@ -151,11 +151,9 @@ CREATE TABLE tasks(
     start_date DATE,
     end_date DATE,
 
-    assigned_to BINARY(16),
-
     state TEXT DEFAULT 'todo',
 
-    priority ENUM('low', 'normal', 'high', 'urgent') DEFAULT 'normal',
+    priority TEXT CHECK( priority IN ('low', 'normal', 'high', 'urgent') ) DEFAULT 'normal',
     estimated_time INTEGER,
 
     FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE RESTRICT,
@@ -179,9 +177,7 @@ CREATE TABLE subtasks(
     start_date DATE,
     end_date DATE,
 
-    assigned_to BINARY(16),
-
-    priority ENUM('low', 'normal', 'high', 'urgent') DEFAULT 'normal',
+    priority TEXT CHECK( priority IN ('low', 'normal', 'high', 'urgent') ) DEFAULT 'normal',
     estimated_time INTEGER,
 
     FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE RESTRICT,
@@ -209,7 +205,7 @@ CREATE TABLE custom_property_definitions (
 CREATE TABLE custom_property_assignments (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   definition_id INTEGER NOT NULL,
-  entity_type ENUM('workspace', 'project', 'folder', 'list', 'task') NOT NULL, 
+  entity_type TEXT CHECK( entity_type IN ('workspace', 'project', 'folder', 'list', 'task') ) NOT NULL, 
   entity_id BINARY(16) NOT NULL,
   value TEXT,
   is_inherited BOOLEAN DEFAULT FALSE,
@@ -229,9 +225,9 @@ CREATE TABLE custom_property_assignments (
 
 CREATE TABLE change_history (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  entity_type ENUM('workspace', 'project', 'folder', 'list', 'task', 'custom_property') NOT NULL, 
+  entity_type TEXT CHECK( entity_type IN ('workspace', 'project', 'folder', 'list', 'task', 'custom_property') ) NOT NULL, 
   entity_id BINARY(16) NOT NULL,
-  change_type ENUM('create', 'update', 'delete') NOT NULL,
+  change_type TEXT CHECK( change_type IN ('create', 'update', 'delete')) NOT NULL,
   field_name TEXT, 
   old_value TEXT, 
   new_value TEXT, 
@@ -255,7 +251,7 @@ CREATE TABLE documents (
   title TEXT NOT NULL,
   content TEXT DEFAULT '',
   workspace_id BINARY(16) NOT NULL,
-  parent_type ENUM('project', 'folder', 'list') NOT NULL,
+  parent_type TEXT CHECK( parent_type IN ('project', 'folder', 'list')) NOT NULL,
   parent_id BINARY(16),
   created_by BINARY(16),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -292,7 +288,7 @@ CREATE TABLE form_submissions (
   data JSON NOT NULL,
   submitted_by BINARY(16) NOT NULL,
   submitted_at DATETIME NOT NULL,
-  status ENUM('submitted', 'reviewed', 'approved', 'rejected') DEFAULT 'submitted',
+  status TEXT CHECK( status IN ('submitted', 'reviewed', 'approved', 'rejected')) DEFAULT 'submitted',
   INDEX idx_form_submissions_form_id (form_id),
   INDEX idx_form_submissions_submitted_by (submitted_by),
   INDEX idx_form_submissions_status (status),
@@ -314,6 +310,24 @@ CREATE TABLE notifications (
   is_read BOOLEAN DEFAULT FALSE,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (recipient_id) REFERENCES users(id)
+);
+
+
+
+CREATE TABLE workspace_invitations (
+  id VARCHAR(12) PRIMARY KEY,
+  workspace_id BINARY(16) NOT NULL,
+  invited_user_id BINARY(16) NOT NULL,
+  invited_by_user_id BINARY(16) NOT NULL,     
+  status TEXT CHECK( status IN ('pending', 'accepted') ) DEFAULT 'pending',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  responded_at TIMESTAMP NULL,
+  expires_at TIMESTAMP,                 
+  role TEXT CHECK( role IN ('admin', 'member', 'guest') ) DEFAULT 'member',
+  message TEXT DEFAULT NULL,                            
+  FOREIGN KEY (workspace_id) REFERENCES workspaces(id) ON DELETE CASCADE,
+  FOREIGN KEY (invited_user_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (invited_by_user_id) REFERENCES users(id) ON DELETE SET NULL
 );
 
 
@@ -340,26 +354,6 @@ CREATE INDEX idx_workspace_assignation_workspace ON workspace_assignation(worksp
 CREATE INDEX idx_workspace_assignation_user ON workspace_assignation(user_id);
 CREATE INDEX idx_workspace_assignation_parent ON workspace_assignation(parent_type, parent_id);
 CREATE INDEX idx_workspace_assignation_assigned_by ON workspace_assignation(assigned_by);
-
-
-CREATE TABLE workspace_invitations (
-  id VARCHAR(12) PRIMARY KEY,
-  workspace_id BINARY(16) NOT NULL,
-  invited_user_id BINARY(16) NOT NULL,
-  invited_by_user_id BINARY(16) NOT NULL,     
-  status TEXT CHECK( status IN ('pending', 'accepted') ) DEFAULT 'pending',
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  responded_at TIMESTAMP NULL,
-  expires_at TIMESTAMP,                 
-  role TEXT CHECK( role IN ('admin', 'member', 'guest') ) DEFAULT 'member',
-  message TEXT DEFAULT NULL,                            
-  FOREIGN KEY (workspace_id) REFERENCES workspaces(id) ON DELETE CASCADE,
-  FOREIGN KEY (invited_user_id) REFERENCES users(id) ON DELETE CASCADE,
-  FOREIGN KEY (invited_by_user_id) REFERENCES users(id) ON DELETE SET NULL
-);
-
-
-
 
 
 
@@ -412,3 +406,78 @@ CREATE TABLE chat_messages (
   INDEX idx_created_at (created_at),
   INDEX idx_reply_to (reply_to_id)
 );
+
+
+
+
+
+
+CREATE TABLE goals (
+  id VARCHAR(36) PRIMARY KEY,
+  workspace_id BINARY(16),
+  name VARCHAR(255) NOT NULL,
+  description TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  created_by BINARY(16) NOT NULL,
+  updated_by BINARY(16)
+  FOREIGN KEY (workspace_id) REFERENCES workspaces(id) ON DELETE CASCADE
+);
+
+
+CREATE TABLE targets (
+    id VARCHAR(36) PRIMARY KEY,
+    goal_id VARCHAR(36) NOT NULL,
+    workspace_id BINARY(16),
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    target_type TEXT CHECK( target_type IN ('numeric', 'boolean', 'task')) DEFAULT 'numeric',
+    target_value INTEGER NOT NULL, 
+    current_value INTEGER DEFAULT 0,
+    unit VARCHAR(50),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (goal_id) REFERENCES goals(id) ON DELETE CASCADE,
+    FOREIGN KEY (workspace_id) REFERENCES workspaces(id) ON DELETE CASCADE
+);
+
+
+CREATE TABLE goal_progress_history (
+    id VARCHAR(36) PRIMARY KEY,
+    goal_id VARCHAR(36) NOT NULL,
+    target_id VARCHAR(36), 
+    previous_value INTEGER,
+    new_value INTEGER NOT NULL,
+    notes TEXT,
+    recorded_by BINARY(16) NOT NULL,
+    recorded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (goal_id) REFERENCES goals(id) ON DELETE CASCADE,
+    FOREIGN KEY (target_id) REFERENCES targets(id) ON DELETE SET NULL
+);
+
+
+CREATE TABLE target_tasks (
+    id VARCHAR(36) PRIMARY KEY,
+    target_id VARCHAR(36) NOT NULL,
+    task_id BINARY(16) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_by BINARY(16) NOT NULL,
+    FOREIGN KEY (target_id) REFERENCES targets(id) ON DELETE CASCADE
+    FOREIGN KEY (task_id) REFERENCES tasks(id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_goals_owner ON goals(owner_id);
+CREATE INDEX idx_goals_team ON goals(team_id);
+CREATE INDEX idx_goals_status ON goals(status);
+CREATE INDEX idx_goals_due_date ON goals(due_date);
+
+CREATE INDEX idx_targets_goal ON targets(goal_id);
+CREATE INDEX idx_targets_completed ON targets(is_completed);
+
+CREATE INDEX idx_progress_goal ON goal_progress_history(goal_id);
+CREATE INDEX idx_progress_target ON goal_progress_history(target_id);
+CREATE INDEX idx_progress_date ON goal_progress_history(recorded_at);
+
+CREATE INDEX idx_target_tasks_target ON target_tasks(target_id);
+CREATE INDEX idx_target_tasks_task ON target_tasks(task_id);
+CREATE INDEX idx_target_tasks_active ON target_tasks(is_active);
