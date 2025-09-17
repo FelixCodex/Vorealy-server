@@ -1,5 +1,9 @@
 import { connect } from './connection.js';
 
+const RETURNING = `HEX(id) AS id, title, HEX(list_id) AS list_id, HEX(workspace_id) AS workspace_id, 
+				   HEX(created_by) AS created_by, created_at, updated_at, start_date, end_date, 
+				   state, priority, estimated_time`;
+
 class TaskRepositoryClass {
 	constructor(connection) {
 		this.connection = connection;
@@ -8,20 +12,8 @@ class TaskRepositoryClass {
 	async getAll() {
 		try {
 			const { rows } = await this.connection.execute(
-				`SELECT 
-          HEX(id) AS id, 
-          title, 
-          HEX(list_id) AS list_id, 
-          HEX(workspace_id) AS workspace_id, 
-          HEX(created_by) AS created_by, 
-          created_at, 
-          start_date, 
-          end_date, 
-          HEX(assigned_to) AS assigned_to, 
-          state, 
-          priority, 
-          estimated_time 
-        FROM tasks;`
+				`SELECT ${RETURNING} 
+        		FROM tasks;`
 			);
 			return rows;
 		} catch (err) {
@@ -33,22 +25,9 @@ class TaskRepositoryClass {
 	async getById(id) {
 		try {
 			const { rows } = await this.connection.execute(
-				`SELECT 
-          HEX(id) AS id, 
-          title, 
-          HEX(list_id) AS list_id, 
-          HEX(workspace_id) AS workspace_id, 
-          HEX(created_by) AS created_by, 
-          created_at, 
-          updated_at, 
-          start_date, 
-          end_date, 
-          HEX(assigned_to) AS assigned_to, 
-          state, 
-          priority, 
-          estimated_time 
-        FROM tasks 
-        WHERE id = UNHEX(?);`,
+				`SELECT ${RETURNING}  
+        		FROM tasks 
+        		WHERE id = UNHEX(?);`,
 				[id]
 			);
 			return rows[0] || null;
@@ -61,22 +40,9 @@ class TaskRepositoryClass {
 	async getByListId(listId) {
 		try {
 			const { rows } = await this.connection.execute(
-				`SELECT 
-          HEX(id) AS id, 
-          title, 
-          HEX(list_id) AS list_id, 
-          HEX(workspace_id) AS workspace_id, 
-          HEX(created_by) AS created_by, 
-          created_at, 
-          updated_at, 
-          start_date, 
-          end_date, 
-          HEX(assigned_to) AS assigned_to, 
-          state, 
-          priority, 
-          estimated_time 
-        FROM tasks 
-        WHERE list_id = UNHEX(?);`,
+				`SELECT ${RETURNING} 
+        		FROM tasks 
+        		WHERE list_id = UNHEX(?);`,
 				[listId]
 			);
 			return rows;
@@ -86,30 +52,64 @@ class TaskRepositoryClass {
 		}
 	}
 
-	async getByAssignedTo(userId) {
+	async getByProjectId(projectId) {
 		try {
 			const { rows } = await this.connection.execute(
-				`SELECT 
-          HEX(id) AS id, 
-          title, 
-          HEX(list_id) AS list_id, 
-          HEX(workspace_id) AS workspace_id, 
-          HEX(created_by) AS created_by, 
-          created_at, 
-          updated_at, 
-          start_date, 
-          end_date, 
-          HEX(assigned_to) AS assigned_to, 
-          state, 
-          priority, 
-          estimated_time 
-        FROM tasks 
-        WHERE assigned_to = UNHEX(?);`,
-				[userId]
+				`SELECT
+          HEX(t.id) AS id,
+          t.title,
+          HEX(t.list_id) AS list_id,
+          HEX(t.workspace_id) AS workspace_id,
+          HEX(t.created_by) AS created_by,
+          t.created_at,
+          t.updated_at,
+          t.start_date,
+          t.end_date,
+          t.state,
+          t.priority,
+          t.estimated_time
+        FROM tasks t
+        INNER JOIN lists l ON t.list_id = l.id
+        LEFT JOIN folders f ON l.parent_id = f.id AND l.parent_type = 'folder'
+        WHERE 
+          (l.parent_type = 'project' AND l.parent_id = UNHEX(?))
+          OR 
+          (l.parent_type = 'folder' AND f.project_id = UNHEX(?))
+        ORDER BY t.created_at DESC;`,
+				[projectId, projectId]
 			);
 			return rows;
 		} catch (err) {
-			console.error('Error en TaskRepository.getByAssignedTo:', err);
+			console.error('Error en TaskRepository.getByProjectId:', err);
+			throw err;
+		}
+	}
+
+	async getByFolderId(folderId) {
+		try {
+			const { rows } = await this.connection.execute(
+				`SELECT
+          HEX(t.id) AS id,
+          t.title,
+          HEX(t.list_id) AS list_id,
+          HEX(t.workspace_id) AS workspace_id,
+          HEX(t.created_by) AS created_by,
+          t.created_at,
+          t.updated_at,
+          t.start_date,
+          t.end_date,
+          t.state,
+          t.priority,
+          t.estimated_time
+        FROM tasks t
+        INNER JOIN lists l ON t.list_id = l.id
+        WHERE l.parent_type = 'folder' AND l.parent_id = UNHEX(?)
+        ORDER BY t.created_at DESC;`,
+				[folderId]
+			);
+			return rows;
+		} catch (err) {
+			console.error('Error en TaskRepository.getByFolderId:', err);
 			throw err;
 		}
 	}
@@ -121,12 +121,10 @@ class TaskRepositoryClass {
 		listId,
 		createdBy,
 		createdAt,
-		updatedAt,
 		startDate = null,
 		endDate = null,
-		assignedTo = null,
 		state = 'todo',
-		priority = 'normal',
+		priority = null,
 		estimatedTime = null,
 	}) {
 		const hexId = id.replace(/-/g, '');
@@ -142,7 +140,6 @@ class TaskRepositoryClass {
           updated_at, 
           start_date, 
           end_date, 
-          assigned_to, 
           state, 
           priority, 
           estimated_time
@@ -150,13 +147,12 @@ class TaskRepositoryClass {
           UNHEX(?), 
           ?, 
           UNHEX(?), 
-		  UNHEX(?)
+		  UNHEX(?),
           UNHEX(?), 
           ?, 
 		  ?,
           ?, 
           ?, 
-          UNHEX(?), 
           ?, 
           ?, 
           ?
@@ -169,7 +165,6 @@ class TaskRepositoryClass {
           updated_at, 
           start_date, 
           end_date, 
-          HEX(assigned_to) AS assigned_to, 
           state, 
           priority, 
           estimated_time;`,
@@ -180,9 +175,9 @@ class TaskRepositoryClass {
 					workspaceId,
 					createdBy,
 					createdAt,
+					createdAt,
 					startDate,
 					endDate,
-					assignedTo,
 					state,
 					priority,
 					estimatedTime,
@@ -200,7 +195,6 @@ class TaskRepositoryClass {
 		title = null,
 		startDate = null,
 		endDate = null,
-		assignedTo = null,
 		state = null,
 		priority = null,
 		estimatedTime = null,
@@ -221,10 +215,6 @@ class TaskRepositoryClass {
 			if (endDate !== null) {
 				updates.push('end_date = ?');
 				values.push(endDate);
-			}
-			if (assignedTo !== null) {
-				updates.push('assigned_to = UNHEX(?)');
-				values.push(assignedTo);
 			}
 			if (state !== null) {
 				updates.push('state = ?');
@@ -253,20 +243,7 @@ class TaskRepositoryClass {
 				`UPDATE tasks 
          SET ${updates.join(', ')} 
          WHERE id = UNHEX(?) 
-         RETURNING 
-           HEX(id) AS id, 
-           title, 
-           HEX(list_id) AS list_id, 
-          HEX(workspace_id) AS workspace_id, 
-           HEX(created_by) AS created_by, 
-           created_at, 
-          updated_at, 
-           start_date, 
-           end_date, 
-           HEX(assigned_to) AS assigned_to, 
-           state, 
-           priority, 
-           estimated_time;`,
+         RETURNING ${RETURNING} ;`,
 				values
 			);
 			return rows[0] || null;
@@ -282,20 +259,7 @@ class TaskRepositoryClass {
 				`UPDATE tasks 
          SET list_id = UNHEX(?) 
          WHERE id = UNHEX(?) 
-         RETURNING 
-           HEX(id) AS id, 
-           title, 
-           HEX(list_id) AS list_id, 
-          HEX(workspace_id) AS workspace_id, 
-           HEX(created_by) AS created_by, 
-           created_at, 
-           updated_at, 
-           start_date, 
-           end_date, 
-           HEX(assigned_to) AS assigned_to, 
-           state, 
-           priority, 
-           estimated_time;`,
+         RETURNING ${RETURNING};`,
 				[newListId, taskId]
 			);
 			return rows[0] || null;

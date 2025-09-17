@@ -14,6 +14,8 @@ import {
 	WorkspaceInvitationRepository,
 	NotificationRepository,
 	ChatRepository,
+	GoalsRepository,
+	WorkspaceAssignationRepository,
 } from './infrastructure/repositories/turso/index.js';
 import { createGoogleAuthRouter } from './routes/authGoogle.routes.js';
 import { createWorkspaceRouter } from './routes/workspace.routes.js';
@@ -32,6 +34,8 @@ import { WorkspaceMemberService } from './modules/taskManager/workspace/interfac
 import { NotificationService } from './modules/notifications/interfaces/services/notification.service.js';
 import { createNotificationRouter } from './routes/notification.routes.js';
 import { createChatRouter } from './routes/chat.routes.js';
+import { createWorkspaceAssignationRouter } from './routes/workspaceAssignation.routes.js';
+import createGoalsRoutes from './routes/goals.routes.js';
 
 // -----------------------------------
 
@@ -98,6 +102,20 @@ export function configurateApp(app) {
 	);
 	app.use(
 		'/app',
+		createWorkspaceAssignationRouter(
+			WorkspaceAssignationRepository,
+			ProjectRepository,
+			FolderRepository,
+			ListRepository,
+			TaskRepository,
+			GoalsRepository,
+			WorkspaceRepository,
+			WorkspaceMemberRepository
+		)
+	);
+	app.use('/app', createGoalsRoutes(GoalsRepository));
+	app.use(
+		'/app',
 		createWorkspaceInvitationRouter(
 			WorkspaceInvitationRepository,
 			WorkspaceRepository,
@@ -126,7 +144,17 @@ export function configurateApp(app) {
 			WorkspaceMemberRepository
 		)
 	);
-	app.use('/app', createTaskRouter(TaskRepository));
+	app.use(
+		'/app',
+		createTaskRouter(
+			TaskRepository,
+			ProjectRepository,
+			FolderRepository,
+			ListRepository,
+			WorkspaceRepository,
+			WorkspaceMemberRepository
+		)
+	);
 	app.use('/app', createSubTaskRouter(SubTaskRepository));
 }
 

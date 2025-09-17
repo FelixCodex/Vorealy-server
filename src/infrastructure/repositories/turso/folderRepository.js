@@ -50,6 +50,20 @@ class FolderRepositoryClass {
 		}
 	}
 
+	async getByWorkspaceId(workspaceId) {
+		try {
+			const { rows } = await this.connection.execute(
+				`SELECT ${RETURNING} FROM folders 
+        		WHERE workspace_id = UNHEX(?);`,
+				[workspaceId]
+			);
+			return rows;
+		} catch (err) {
+			console.error('Error en FolderRepository.getByWorkspaceId:', err);
+			throw err;
+		}
+	}
+
 	async create({
 		id,
 		projectId,

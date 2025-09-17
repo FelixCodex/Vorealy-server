@@ -16,9 +16,10 @@ export const createWorkspaceInputSchema = z.object({
 		.default('#4169E1')
 		.optional(),
 	icon: z
-		.string()
-		.max(10, 'El ID del icono no puede exceder los 10 caracteres')
-		.optional(),
+		.number()
+		.max(3, 'El ID del icono no puede exceder los 10 caracteres')
+		.optional()
+		.default(1),
 });
 
 export const updateWorkspaceInputSchema = z.object({
@@ -34,7 +35,7 @@ export const updateWorkspaceInputSchema = z.object({
 			'Formato de color hexadecimal inválido (ej. #RRGGBB o #RGB)'
 		)
 		.optional(),
-	icon_id: z
+	icon: z
 		.string()
 		.max(10, 'El ID del icono no puede exceder los 10 caracteres')
 		.optional(),

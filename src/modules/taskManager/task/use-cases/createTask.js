@@ -9,7 +9,6 @@ export default function createTask(taskRepository, listRepository) {
 		createdBy,
 		startDate,
 		endDate,
-		assignedTo,
 		state,
 		priority,
 		estimatedTime,
@@ -20,17 +19,14 @@ export default function createTask(taskRepository, listRepository) {
 					'El nombre de la tarea y el ID del workspace son obligatorios'
 				);
 			}
-			if (!['low', 'normal', 'high', 'urgent'].includes(priority)) {
+			if (!priority) priority = null;
+			if (!['low', 'normal', 'high', 'urgent', null].includes(priority)) {
 				throw new Error('La prioridad de la tarea no es valida');
 			}
 
 			const list = await listRepository.getById(listId);
 			if (!list) {
 				throw new Error('Lista no encontrada');
-			}
-
-			if (!list.statuses.includes(state)) {
-				throw new Error('El estado de la tarea no existe en la lista');
 			}
 
 			const now = getDateNow();
@@ -45,7 +41,6 @@ export default function createTask(taskRepository, listRepository) {
 				now,
 				startDate,
 				endDate,
-				assignedTo,
 				state,
 				priority,
 				estimatedTime

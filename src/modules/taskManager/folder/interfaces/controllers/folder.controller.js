@@ -1,6 +1,7 @@
 import {
 	folderIdParamSchema,
 	projectIdParamSchema,
+	workspaceIdParamSchema,
 } from '../../infrastructure/schemas/folder.schema.js';
 import createFolder from '../../use-cases/createFolder.js';
 import deleteFolder from '../../use-cases/deleteFolder.js';
@@ -8,6 +9,7 @@ import deleteFoldersByProjectId from '../../use-cases/deleteFoldersByProjectId.j
 import getAllFolders from '../../use-cases/getAllFolders.js';
 import getFolderById from '../../use-cases/getFolderById.js';
 import getFoldersByProjectId from '../../use-cases/getFoldersByProjectId.js';
+import getFoldersByWorkspaceId from '../../use-cases/getFoldersByWorkspaceId.js';
 import updateFolder from '../../use-cases/updateFolder.js';
 
 export default function createFolderController(
@@ -16,6 +18,8 @@ export default function createFolderController(
 ) {
 	const getAllFoldersUseCase = getAllFolders(folderRepository);
 	const getFolderByIdUseCase = getFolderById(folderRepository);
+	const getFoldersByWorkspaceIdUseCase =
+		getFoldersByWorkspaceId(folderRepository);
 	const getFoldersByProjectIdUseCase = getFoldersByProjectId(
 		folderRepository,
 		projectRepository
@@ -81,6 +85,20 @@ export default function createFolderController(
 					projectId,
 					workspaceId
 				);
+				return res.status(200).json({ success: true, data: folders });
+			} catch (error) {
+				return res.status(500).json({
+					success: false,
+					message: error.message || 'Error al obtener carpetas del proyecto',
+				});
+			}
+		},
+
+		async getFoldersByWorkspaceId(req, res) {
+			try {
+				const { workspaceId } = workspaceIdParamSchema.parse(req.params);
+
+				const folders = await getFoldersByWorkspaceIdUseCase(workspaceId);
 				return res.status(200).json({ success: true, data: folders });
 			} catch (error) {
 				return res.status(500).json({

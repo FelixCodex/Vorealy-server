@@ -36,14 +36,10 @@ const projectCoreSchema = z.object({
 			/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/,
 			'Formato de color hexadecimal inválido (ej. #RRGGBB o #RGB)'
 		)
-		.default('#4169E1')
+		.default('#D1D5DB')
 		.optional(),
 
-	icon: z
-		.string()
-		.max(4, 'El icono no puede exceder los 4 caracteres')
-		.default('1')
-		.optional(),
+	icon: z.number().max(255).optional(),
 
 	visibility: projectVisibilityEnum.default('public').optional(),
 

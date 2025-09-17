@@ -1,4 +1,4 @@
-const { z } = require('zod');
+import { z } from 'zod';
 
 const parentTypes = ['project', 'folder', 'list', 'task', 'subtask'];
 

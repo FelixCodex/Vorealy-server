@@ -1,4 +1,4 @@
-import { connect } from './connection';
+import { connect } from './connection.js';
 
 const RETURNING = `HEX(id) as id, HEX(user_id) as user_id, HEX(workspace_id) as workspace_id,
                 parent_type as parent_type, HEX(parent_id) as parent_id,assigned_at as assigned_at, 

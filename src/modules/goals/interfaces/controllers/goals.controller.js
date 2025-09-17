@@ -13,11 +13,6 @@ import { linkTaskToTarget } from '../../use-cases/targets/linkTaskToTarget.js';
 import { unlinkTaskFromTarget } from '../../use-cases/targets/unlinkTaskFromTarget.js';
 import { updateTargetProgress } from '../../use-cases/targets/updateTargetProgress.js';
 import {
-	createGoalSchema,
-	updateGoalSchema,
-	createTargetSchema,
-	updateTargetProgressSchema,
-	recordProgressSchema,
 	linkTaskToTargetSchema,
 	goalParamsSchema,
 	targetParamsSchema,
@@ -26,29 +21,29 @@ import {
 } from '../../infrastructure/schemas/goals.schemas.js';
 import { deleteTarget } from '../../use-cases/targets/deleteTarget.js';
 
-export default function createGoalsController(repositories) {
-	const createGoalUseCase = createGoal(repositories);
-	const getGoalByIdUseCase = getGoalById(repositories);
-	const getGoalsByWorkspaceIdUseCase = getGoalsByWorkspaceId(repositories);
-	const updateGoalUseCase = updateGoal(repositories);
-	const deleteGoalUseCase = deleteGoal(repositories);
-	const deleteTargetUseCase = deleteTarget(repositories);
-	const createTargetUseCase = createTarget(repositories);
-	const getTargetsByGoalIdUseCase = getTargetsByGoalId(repositories);
-	const updateTargetProgressUseCase = updateTargetProgress(repositories);
-	const recordProgressUseCase = recordProgress(repositories);
-	const getProgressHistoryUseCase = getProgressHistory(repositories);
-	const linkTaskToTargetUseCase = linkTaskToTarget(repositories);
-	const unlinkTaskFromTargetUseCase = unlinkTaskFromTarget(repositories);
-	const getTasksByTargetIdUseCase = getTasksByTargetId(repositories);
+export default function createGoalsController(goalRepository) {
+	const createGoalUseCase = createGoal(goalRepository);
+	const getGoalByIdUseCase = getGoalById(goalRepository);
+	const getGoalsByWorkspaceIdUseCase = getGoalsByWorkspaceId(goalRepository);
+	const updateGoalUseCase = updateGoal(goalRepository);
+	const deleteGoalUseCase = deleteGoal(goalRepository);
+	const deleteTargetUseCase = deleteTarget(goalRepository);
+	const createTargetUseCase = createTarget(goalRepository);
+	const getTargetsByGoalIdUseCase = getTargetsByGoalId(goalRepository);
+	const updateTargetProgressUseCase = updateTargetProgress(goalRepository);
+	const recordProgressUseCase = recordProgress(goalRepository);
+	const getProgressHistoryUseCase = getProgressHistory(goalRepository);
+	const linkTaskToTargetUseCase = linkTaskToTarget(goalRepository);
+	const unlinkTaskFromTargetUseCase = unlinkTaskFromTarget(goalRepository);
+	const getTasksByTargetIdUseCase = getTasksByTargetId(goalRepository);
 	const getGoalWithTargetsAndProgressUseCase =
-		getGoalWithTargetsAndProgress(repositories);
+		getGoalWithTargetsAndProgress(goalRepository);
 
 	return {
 		async createGoal(req, res) {
 			try {
 				const { workspaceId } = workspaceParamsSchema.parse(req.params);
-				const goalData = createGoalSchema.parse(req.body);
+				const goalData = req.body;
 				const userId = req.user.id;
 
 				const data = await createGoalUseCase({
@@ -102,7 +97,7 @@ export default function createGoalsController(repositories) {
 		async updateGoal(req, res) {
 			try {
 				const { goalId } = goalParamsSchema.parse(req.params);
-				const updateData = updateGoalSchema.parse(req.body);
+				const updateData = req.body;
 				const userId = req.user.id;
 
 				const data = await updateGoalUseCase({ goalId, updateData, userId });
@@ -145,7 +140,7 @@ export default function createGoalsController(repositories) {
 
 		async createTarget(req, res) {
 			try {
-				const targetData = createTargetSchema.parse(req.body);
+				const targetData = req.body;
 				const { workspaceId } = workspaceParamsSchema.parse(req.params);
 
 				const data = await createTargetUseCase({ ...targetData, workspaceId });
@@ -175,7 +170,7 @@ export default function createGoalsController(repositories) {
 		async updateTargetProgress(req, res) {
 			try {
 				const { targetId } = targetParamsSchema.parse(req.params);
-				const { currentValue } = updateTargetProgressSchema.parse(req.body);
+				const { currentValue } = req.body;
 
 				const data = await updateTargetProgressUseCase({
 					targetId,
@@ -215,21 +210,6 @@ export default function createGoalsController(repositories) {
 				return res.status(500).json({
 					success: false,
 					message: error.message || 'Error al eliminar el goal',
-				});
-			}
-		},
-
-		async recordProgress(req, res) {
-			try {
-				const progressData = recordProgressSchema.parse(req.body);
-				const userId = req.user.id;
-
-				const data = await recordProgressUseCase({ ...progressData, userId });
-				return res.status(201).json({ success: true, data });
-			} catch (error) {
-				return res.status(500).json({
-					success: false,
-					message: error.message || 'Error al registrar el progreso',
 				});
 			}
 		},

@@ -1,7 +1,9 @@
+import { connect } from './connection.js';
+
 const RETURNING = `id, name, description, HEX(workspace_id) as workspace_id, created_at, 
                     updated_at, HEX(created_by) as created_by, HEX(updated_by) as updated_by`;
 
-class GoalsRepository {
+class GoalsRepositoryClass {
 	constructor(connection) {
 		this.connection = connection;
 	}
@@ -358,3 +360,6 @@ class GoalsRepository {
 		}
 	}
 }
+
+const GoalsRepository = new GoalsRepositoryClass(await connect());
+export default GoalsRepository;

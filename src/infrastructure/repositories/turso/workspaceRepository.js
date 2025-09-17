@@ -20,7 +20,7 @@ class WorkspaceRepositoryClass {
 	async getAllByUserId(userId) {
 		try {
 			const { rows } = await this.connection.execute(
-				`SELECT HEX(id) AS id, HEX(owner_id) AS owner_id, name, created_at 
+				`SELECT HEX(id) AS id, HEX(owner_id) AS owner_id, name, created_at, color, icon_id
          	     FROM workspaces 
          		 WHERE owner_id = UNHEX(?);`,
 				[userId]

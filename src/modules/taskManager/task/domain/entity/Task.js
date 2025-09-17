@@ -9,7 +9,6 @@ export class Task {
 		updatedAt = new Date(),
 		startDate,
 		endDate,
-		assignedTo,
 		state = 'todo',
 		priority = 'normal',
 		estimatedTime
@@ -23,7 +22,6 @@ export class Task {
 		this.updatedAt = updatedAt;
 		this.startDate = startDate;
 		this.endDate = endDate;
-		this.assignedTo = assignedTo;
 		this.state = state;
 		this.priority = priority;
 		this.estimatedTime = estimatedTime;

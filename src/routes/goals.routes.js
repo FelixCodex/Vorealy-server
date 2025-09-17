@@ -1,18 +1,31 @@
 import { Router } from 'express';
-import createGoalsController from '../modules/goals/interfaces/controllers/goals.controller';
+import createGoalsController from '../modules/goals/interfaces/controllers/goals.controller.js';
+import workspacePermissionMiddleware from '../modules/taskManager/workspace/infrastructure/middleware/workspacePermission.js';
+import workspaceMatchMiddleware from '../modules/taskManager/workspace/infrastructure/middleware/workspaceMatch.js';
+import { createAuthRequiredMiddelware } from '../modules/auth/infrastructure/middelwares/authRequired.js';
+import { SECRET_JWT_KEY } from '../config.js';
+import { validateSchema } from '../shared/middlewares/validateSchemaMiddleware.js';
+import {
+	createGoalSchema,
+	createTargetSchema,
+	updateGoalSchema,
+	updateTargetProgressSchema,
+} from '../modules/goals/infrastructure/schemas/goals.schemas.js';
 
 export default function createGoalsRoutes(goalsRepo) {
 	const router = Router();
 
-	const goalsController = createGoalsController(repositories);
+	const goalsController = createGoalsController(goalsRepo);
 	const authRequired = createAuthRequiredMiddelware(SECRET_JWT_KEY);
 
 	router.use(authRequired);
 
-	// Goals routes
+	// ---- ----
+
 	router.post(
 		'/workspaces/:workspaceId/goals',
 		workspacePermissionMiddleware(['admin', 'member']),
+		validateSchema(createGoalSchema),
 		goalsController.createGoal
 	);
 	router.get(
@@ -30,6 +43,7 @@ export default function createGoalsRoutes(goalsRepo) {
 		'/workspaces/:workspaceId/goals/:goalId',
 		workspacePermissionMiddleware(['admin', 'member']),
 		workspaceMatchMiddleware(goalsRepo, 'goalId', 'getGoalById'),
+		validateSchema(updateGoalSchema),
 		goalsController.updateGoal
 	);
 	router.delete(
@@ -44,6 +58,8 @@ export default function createGoalsRoutes(goalsRepo) {
 		workspaceMatchMiddleware(goalsRepo, 'goalId', 'getGoalById'),
 		goalsController.getGoalWithTargetsAndProgress
 	);
+
+	// ---- ----
 
 	router.get(
 		'/workspaces/:workspaceId/goals/:goalId/targets',
@@ -60,12 +76,14 @@ export default function createGoalsRoutes(goalsRepo) {
 	router.post(
 		'/workspaces/:workspaceId/targets',
 		workspacePermissionMiddleware(['admin', 'member']),
+		validateSchema(createTargetSchema),
 		goalsController.createTarget
 	);
 	router.put(
 		'/workspaces/:workspaceId/targets/:targetId/progress',
 		workspacePermissionMiddleware(['admin', 'member']),
 		workspaceMatchMiddleware(goalsRepo, 'targetId', 'getTargetById'),
+		validateSchema(updateTargetProgressSchema),
 		goalsController.updateTargetProgress
 	);
 	router.delete(
@@ -74,6 +92,8 @@ export default function createGoalsRoutes(goalsRepo) {
 		workspaceMatchMiddleware(goalsRepo, 'targetId', 'getTargetById'),
 		goalsController.deleteTarget
 	);
+
+	// ---- ----
 
 	router.post(
 		'/workspaces/:workspaceId/targets/:targetId/link-task/:taskId',

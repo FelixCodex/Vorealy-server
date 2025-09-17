@@ -11,9 +11,9 @@ export class List {
 		createdAt = new Date(),
 		updatedAt = new Date(),
 		automationRules,
-		assignedTo,
-		defaultStates,
-		statuses,
+		todoColor,
+		todoName,
+		doneName,
 		priority = 'normal',
 		isPrivate = false,
 		estimatedTime
@@ -29,9 +29,9 @@ export class List {
 		this.createdAt = createdAt;
 		this.updatedAt = updatedAt;
 		this.automationRules = automationRules;
-		this.assignedTo = assignedTo;
-		this.defaultStates = defaultStates;
-		this.statuses = statuses;
+		this.todoColor = todoColor;
+		this.todoName = todoName;
+		this.doneName = doneName;
 		this.priority = priority;
 		this.isPrivate = isPrivate;
 		this.estimatedTime = estimatedTime;

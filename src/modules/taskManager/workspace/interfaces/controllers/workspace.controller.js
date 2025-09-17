@@ -14,7 +14,7 @@ export default function createWorkspaceController(workspaceRepo) {
 			const userId = req.user.id;
 
 			try {
-				const { name, color, icon } = req.body;
+				const { name, color, icon = 1 } = req.body;
 
 				const createdWorkspace = await createWSUseCase({
 					userId,

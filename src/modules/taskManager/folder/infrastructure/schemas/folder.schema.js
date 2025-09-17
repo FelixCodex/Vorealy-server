@@ -15,19 +15,19 @@ const folderCoreSchema = z.object({
 			/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/,
 			'Formato de color hexadecimal invalido'
 		)
-		.default('#808080')
+		.default('#D1D5DB')
 		.optional(),
 
 	icon: z.number().max(255).optional(),
 
-	is_private: z.boolean().optional(),
+	isPrivate: z.boolean().optional(),
 
-	automation_rules: z.any().optional(),
+	automationRules: z.any().optional(),
 	metadata: z.any().optional(),
 });
 
 export const createFolderInputSchema = folderCoreSchema.extend({
-	project_id: uuidSchema.nonempty(
+	projectId: uuidSchema.nonempty(
 		'El ID del proyecto es requerido para crear una carpeta'
 	),
 });

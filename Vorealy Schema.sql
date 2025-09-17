@@ -42,7 +42,7 @@ CREATE TABLE projects (
   name VARCHAR(255) NOT NULL,
   description TEXT,
   color VARCHAR(7) DEFAULT '#4169E1',
-  icon VARCHAR(100),
+  icon INT,
   
   visibility TEXT CHECK( visibility IN ('public', 'private') ) DEFAULT 'public',
 
@@ -80,7 +80,7 @@ CREATE TABLE folders (
   description TEXT,
   
   color VARCHAR(7) DEFAULT '#808080',  
-  icon VARCHAR(100),                   
+  icon INT,                   
            
   is_private BOOLEAN DEFAULT FALSE,    
 
@@ -119,18 +119,17 @@ CREATE TABLE lists (
 
     automation_rules JSON,
 
-    assigned_to BINARY(16),
+    todo_color JSON DEFAULT "#E74C3C",
+    todo_name JSON DEFAULT "TODO",
+    done_color JSON DEFAULT "#F39C12",
+    done_name JSON DEFAULT "Done",
 
-    default_states JSON DEFAULT "[{ name: 'TODO', color: '#E74C3C' },{ name: 'Done', color: '#F39C12' }]",
-    statuses JSON,
-
-    priority TEXT CHECK( priority IN ('low', 'normal', 'high', 'urgent') ) DEFAULT 'normal',
+    priority TEXT CHECK( priority IN ('low', 'normal', 'high', 'urgent', null) ) DEFAULT null,
     is_private BOOLEAN DEFAULT FALSE,
 
     estimated_time INTEGER,
 
     FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE RESTRICT,
-    FOREIGN KEY (assigned_to) REFERENCES users(id) ON DELETE SET NULL
 );
 
 
@@ -153,11 +152,10 @@ CREATE TABLE tasks(
 
     state TEXT DEFAULT 'todo',
 
-    priority TEXT CHECK( priority IN ('low', 'normal', 'high', 'urgent') ) DEFAULT 'normal',
+    priority TEXT CHECK( priority IN ('low', 'normal', 'high', 'urgent', null) ) DEFAULT null,
     estimated_time INTEGER,
 
-    FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE RESTRICT,
-    FOREIGN KEY (assigned_to) REFERENCES users(id) ON DELETE SET NULL
+    FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE RESTRICT
 );
 
 
@@ -180,13 +178,29 @@ CREATE TABLE subtasks(
     priority TEXT CHECK( priority IN ('low', 'normal', 'high', 'urgent') ) DEFAULT 'normal',
     estimated_time INTEGER,
 
-    FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE RESTRICT,
-    FOREIGN KEY (assigned_to) REFERENCES users(id) ON DELETE SET NULL
+    FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE RESTRICT
 );
 
 
 
 
+
+CREATE TABLE list_statuses (
+    id BINARY(16) PRIMARY KEY,
+    list_id BINARY(16) NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    color VARCHAR(7) NOT NULL DEFAULT '#808080',
+    
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by BINARY(16) NOT NULL,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_by BINARY(16),
+    
+    FOREIGN KEY (list_id) REFERENCES lists(id) ON DELETE CASCADE,
+    FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE RESTRICT,
+    FOREIGN KEY (updated_by) REFERENCES users(id) ON DELETE SET NULL,
+    UNIQUE (list_id, name)
+);
 
 
 
@@ -337,7 +351,7 @@ CREATE TABLE workspace_assignation (
     id BINARY(16) PRIMARY KEY,
     user_id BINARY(16) NOT NULL,
     workspace_id BINARY(16) NOT NULL,
-    parent_type TEXT CHECK( parent_type IN ('project', 'folder', 'list', 'task', 'subtask') ) NOT NULL,
+    parent_type TEXT CHECK( parent_type IN ('project', 'folder', 'list', 'task', 'target') ) NOT NULL,
     parent_id BINARY(16) NOT NULL,
     assigned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     assigned_by BINARY(16),

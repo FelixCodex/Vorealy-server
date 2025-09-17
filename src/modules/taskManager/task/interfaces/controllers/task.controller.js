@@ -3,17 +3,32 @@ import deleteTask from '../../use-cases/deleteTask.js';
 import deleteTasksByListId from '../../use-cases/deleteTasksByListId.js';
 import getAllTasks from '../../use-cases/getAllTasks.js';
 import getTaskById from '../../use-cases/getTaskById.js';
+import getTasksByFolderId from '../../use-cases/getTasksByFolderId.js';
 import getTasksByListId from '../../use-cases/getTasksByListId.js';
+import getTasksByProjectId from '../../use-cases/getTasksByProjectId.js';
 import updateTask from '../../use-cases/updateTask.js';
 
-export default function createTaskController(taskRepository) {
+export default function createTaskController(
+	taskRepository,
+	projectRepository,
+	folderRepository,
+	listRepository
+) {
 	const getAllTasksUseCase = getAllTasks(taskRepository);
 	const getTaskByIdUseCase = getTaskById(taskRepository);
 	const getTasksByListIdUseCase = getTasksByListId(taskRepository);
-	const createTaskUseCase = createTask(taskRepository);
+	const createTaskUseCase = createTask(taskRepository, listRepository);
 	const updateTaskUseCase = updateTask(taskRepository);
 	const deleteTaskUseCase = deleteTask(taskRepository);
 	const deleteTasksByListIdUseCase = deleteTasksByListId(taskRepository);
+	const getTasksByProjectIdUseCase = getTasksByProjectId(
+		taskRepository,
+		projectRepository
+	);
+	const getTasksByFolderIdUseCase = getTasksByFolderId(
+		taskRepository,
+		folderRepository
+	);
 
 	return {
 		async getAllTasks(req, res) {
@@ -65,6 +80,46 @@ export default function createTaskController(taskRepository) {
 				}
 
 				const tasks = await getTasksByListIdUseCase(listId);
+				return res.status(200).json({ success: true, data: tasks });
+			} catch (error) {
+				return res.status(500).json({
+					success: false,
+					message: error.message || 'Error al obtener tareas de la lista',
+				});
+			}
+		},
+
+		async getTasksByProjectId(req, res) {
+			try {
+				const { projectId } = req.params;
+				if (!projectId) {
+					return res.status(400).json({
+						success: false,
+						message: 'El ID del projecto es requerido',
+					});
+				}
+
+				const tasks = await getTasksByProjectIdUseCase(projectId);
+				return res.status(200).json({ success: true, data: tasks });
+			} catch (error) {
+				return res.status(500).json({
+					success: false,
+					message: error.message || 'Error al obtener tareas de la lista',
+				});
+			}
+		},
+
+		async getTasksByFolderId(req, res) {
+			try {
+				const { folderId } = req.params;
+				if (!folderId) {
+					return res.status(400).json({
+						success: false,
+						message: 'El ID de la carpeta es requerido',
+					});
+				}
+
+				const tasks = await getTasksByFolderIdUseCase(folderId);
 				return res.status(200).json({ success: true, data: tasks });
 			} catch (error) {
 				return res.status(500).json({

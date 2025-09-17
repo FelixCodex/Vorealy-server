@@ -45,6 +45,16 @@ export const createFolderRouter = (
 		folderController.getFoldersByProjectId
 	);
 
+	router.get(
+		'/workspaces/:workspaceId/folders',
+		workspacePermissionMiddleware(
+			memberRepo,
+			['admin', 'member'],
+			workspaceRepo
+		),
+		folderController.getFoldersByWorkspaceId
+	);
+
 	router.post(
 		'/workspaces/:workspaceId/folders',
 		validateSchema(createFolderInputSchema),

@@ -4,37 +4,37 @@ import {
 	getAssignationsByParentSchema,
 	getAssignationsByUserSchema,
 	getAssignationsByWorkspaceSchema,
-} from '../../infrastructure/schemas/workspaceAssignation.schema';
-import createAssignation from '../../use-cases/workspaceAssignation/createAssignation';
-import deleteAssignation from '../../use-cases/workspaceAssignation/deleteAssignation';
-import getAssignationsByWorkspace from '../../use-cases/workspaceAssignation/getAssignationByWorkspace';
-import getAssignationsByParent from '../../use-cases/workspaceAssignation/getAssignationsByParent';
-import getAssignationsByUser from '../../use-cases/workspaceAssignation/getAssignationsByUser';
+} from '../../infrastructure/schemas/workspaceAssignation.schema.js';
+import createAssignation from '../../use-cases/workspaceAssignation/createAssignation.js';
+import deleteAssignation from '../../use-cases/workspaceAssignation/deleteAssignation.js';
+import getAssignationsByWorkspace from '../../use-cases/workspaceAssignation/getAssignationByWorkspace.js';
+import getAssignationsByParent from '../../use-cases/workspaceAssignation/getAssignationsByParent.js';
+import getAssignationsByUser from '../../use-cases/workspaceAssignation/getAssignationsByUser.js';
 
 export default function createWorkspaceAssignationController(
 	assignationRepo,
-	memberRepo
+	memberRepo,
+	projectRepo,
+	folderRepo,
+	listRepo,
+	taskRepo,
+	goalRepo
 ) {
 	const createAssignationUseCase = createAssignation(
 		assignationRepo,
-		memberRepo
+		memberRepo,
+		projectRepo,
+		folderRepo,
+		listRepo,
+		taskRepo,
+		goalRepo
 	);
-	const getAssignationsByWorkspaceUseCase = getAssignationsByWorkspace(
-		assignationRepo,
-		memberRepo
-	);
-	const getAssignationsByUserUseCase = getAssignationsByUser(
-		assignationRepo,
-		memberRepo
-	);
-	const getAssignationsByParentUseCase = getAssignationsByParent(
-		assignationRepo,
-		memberRepo
-	);
-	const deleteAssignationUseCase = deleteAssignation(
-		assignationRepo,
-		memberRepo
-	);
+	const getAssignationsByWorkspaceUseCase =
+		getAssignationsByWorkspace(assignationRepo);
+	const getAssignationsByUserUseCase = getAssignationsByUser(assignationRepo);
+	const getAssignationsByParentUseCase =
+		getAssignationsByParent(assignationRepo);
+	const deleteAssignationUseCase = deleteAssignation(assignationRepo);
 
 	return {
 		async createAssignation(req, res) {

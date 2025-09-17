@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 const uuidSchema = z.string().regex(/^[a-fA-F0-9]{32}$/, 'UUID invalido');
 
-const taskPriorityEnum = z.enum(['low', 'normal', 'high', 'urgent'], {
+const taskPriorityEnum = z.enum(['low', 'normal', 'high', 'urgent', null], {
 	errorMap: () => ({
 		message: 'Prioridad inválida. Debe ser "low", "normal", "high" o "urgent".',
 	}),
@@ -11,16 +11,14 @@ const taskPriorityEnum = z.enum(['low', 'normal', 'high', 'urgent'], {
 const taskCoreSchema = z.object({
 	title: z.string().min(1, 'El título de la tarea no puede estar vacío'),
 
-	start_date: z.string().datetime().optional(),
+	startDate: z.string().datetime().optional(),
 
-	end_date: z.string().datetime().optional(),
-
-	assigned_to: uuidSchema.optional(),
+	endDate: z.string().datetime().optional(),
 	state: z.string().default('todo').optional(),
 
-	priority: taskPriorityEnum.default('normal').optional(),
+	priority: taskPriorityEnum.default(null).optional(),
 
-	estimated_time: z
+	estimatedTime: z
 		.number()
 		.int('El tiempo estimado debe ser un número entero')
 		.positive('El tiempo estimado debe ser positivo')
@@ -28,11 +26,8 @@ const taskCoreSchema = z.object({
 });
 
 export const createTaskInputSchema = taskCoreSchema.extend({
-	list_id: uuidSchema.nonempty(
+	listId: uuidSchema.nonempty(
 		'El ID de la lista es requerido para crear una tarea'
-	),
-	workspace_id: uuidSchema.nonempty(
-		'El ID del workspace es requerido para crear una tarea'
 	),
 });
 

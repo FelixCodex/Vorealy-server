@@ -10,53 +10,111 @@ import {
 	updateTaskInputSchema,
 } from '../modules/taskManager/task/infrastructure/schemas/task.schema.js';
 
-export const createTaskRouter = Repository => {
+export const createTaskRouter = (
+	Repository,
+	projectRepository,
+	folderRepository,
+	listRepository,
+	workspaceRepository,
+	memberRepository
+) => {
 	const router = Router();
 
-	const taskController = createTaskController(Repository);
+	const taskController = createTaskController(
+		Repository,
+		projectRepository,
+		folderRepository,
+		listRepository
+	);
 	const authRequired = createAuthRequiredMiddelware(SECRET_JWT_KEY);
 
 	router.use(authRequired);
 
 	router.get(
-		'/tasks/:id',
-		workspacePermissionMiddleware(['admin', 'member']),
+		'/workspaces/:workspaceId/tasks/:id',
+		workspacePermissionMiddleware(
+			memberRepository,
+			['admin', 'member'],
+			workspaceRepository
+		),
 		workspaceMatchMiddleware(Repository),
 		taskController.getTaskById
 	);
 
 	router.get(
-		'/tasks/list/:listId',
-		workspacePermissionMiddleware(['admin', 'member']),
-		workspaceMatchMiddleware(Repository, 'listId', 'getByListId'),
+		'/workspaces/:workspaceId/tasks/list/:listId',
+		workspacePermissionMiddleware(
+			memberRepository,
+			['admin', 'member'],
+			workspaceRepository
+		),
+		workspaceMatchMiddleware(listRepository, 'listId'),
 		taskController.getTasksByListId
 	);
 
+	router.get(
+		'/workspaces/:workspaceId/tasks/folder/:folderId',
+		workspacePermissionMiddleware(
+			memberRepository,
+			['admin', 'member'],
+			workspaceRepository
+		),
+		workspaceMatchMiddleware(folderRepository, 'folderId'),
+		taskController.getTasksByFolderId
+	);
+
+	router.get(
+		'/workspaces/:workspaceId/tasks/project/:projectId',
+		workspacePermissionMiddleware(
+			memberRepository,
+			['admin', 'member'],
+			workspaceRepository
+		),
+		workspaceMatchMiddleware(projectRepository, 'projectId'),
+		taskController.getTasksByProjectId
+	);
+
 	router.post(
-		'/tasks',
+		'/workspaces/:workspaceId/tasks',
 		validateSchema(createTaskInputSchema),
-		workspacePermissionMiddleware(['admin', 'member']),
+		workspacePermissionMiddleware(
+			memberRepository,
+			['admin', 'member'],
+			workspaceRepository
+		),
 		taskController.createTask
 	);
 
 	router.put(
-		'/tasks/:id',
+		'/workspaces/:workspaceId/tasks/:id',
 		validateSchema(updateTaskInputSchema),
-		workspacePermissionMiddleware(['admin', 'member']),
+		workspacePermissionMiddleware(
+			memberRepository,
+			['admin', 'member'],
+			workspaceRepository
+		),
 		workspaceMatchMiddleware(Repository),
 		taskController.updateTask
 	);
 
 	router.delete(
-		'/tasks/:id',
-		workspacePermissionMiddleware(['admin', 'member']),
+		'/workspaces/:workspaceId/tasks/:id',
+		workspacePermissionMiddleware(
+			memberRepository,
+			['admin', 'member'],
+			workspaceRepository
+		),
 		workspaceMatchMiddleware(Repository),
 		taskController.deleteTask
 	);
 
 	router.delete(
-		'/tasks/list/:listId',
-		workspacePermissionMiddleware(['admin', 'member']),
+		'/workspaces/:workspaceId/tasks/list/:listId',
+		workspacePermissionMiddleware(
+			memberRepository,
+			['admin', 'member'],
+			workspaceRepository
+		),
 		workspaceMatchMiddleware(Repository, 'listId', 'getByListId'),
 		taskController.deleteTasksByListId
 	);

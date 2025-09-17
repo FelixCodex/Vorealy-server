@@ -6,8 +6,10 @@ import { SECRET_JWT_KEY } from '../config.js';
 import { validateSchema } from '../shared/middlewares/validateSchemaMiddleware.js';
 import {
 	createListInputSchema,
+	createStatusInputSchema,
 	listParentInputSchema,
 	updateListInputSchema,
+	updateStatusInputSchema,
 } from '../modules/taskManager/list/infrastructure/schemas/list.schema.js';
 import createListController from '../modules/taskManager/list/interfaces/controller/list.controller.js';
 
@@ -55,6 +57,46 @@ export const createListRouter = (
 		listController.getListsByParent
 	);
 
+	router.get(
+		'/workspaces/:workspaceId/lists',
+		workspacePermissionMiddleware(
+			memberRepo,
+			['admin', 'member'],
+			workspaceRepo
+		),
+		listController.getListsByWorkspaceId
+	);
+
+	router.get(
+		'/workspaces/:workspaceId/lists/:listId/statuses',
+		workspacePermissionMiddleware(
+			memberRepo,
+			['admin', 'member'],
+			workspaceRepo
+		),
+		listController.getStatusesByListId
+	);
+
+	router.get(
+		'/workspaces/:workspaceId/lists/folder/:folderId/statuses',
+		workspacePermissionMiddleware(
+			memberRepo,
+			['admin', 'member'],
+			workspaceRepo
+		),
+		listController.getStatusesByFolderId
+	);
+
+	router.get(
+		'/workspaces/:workspaceId/lists/project/:projectId/statuses',
+		workspacePermissionMiddleware(
+			memberRepo,
+			['admin', 'member'],
+			workspaceRepo
+		),
+		listController.getStatusesByProjectId
+	);
+
 	router.post(
 		'/workspaces/:workspaceId/lists',
 		validateSchema(createListInputSchema),
@@ -64,6 +106,17 @@ export const createListRouter = (
 			workspaceRepo
 		),
 		listController.createList
+	);
+
+	router.post(
+		'/workspaces/:workspaceId/lists/:listId/status',
+		validateSchema(createStatusInputSchema),
+		workspacePermissionMiddleware(
+			memberRepo,
+			['admin', 'member'],
+			workspaceRepo
+		),
+		listController.createStatus
 	);
 
 	router.put(
@@ -76,6 +129,17 @@ export const createListRouter = (
 		),
 		workspaceMatchMiddleware(Repository),
 		listController.updateList
+	);
+
+	router.put(
+		'/workspaces/:workspaceId/lists/status/:statusId',
+		validateSchema(updateStatusInputSchema),
+		workspacePermissionMiddleware(
+			memberRepo,
+			['admin', 'member'],
+			workspaceRepo
+		),
+		listController.updateStatus
 	);
 
 	router.put(
@@ -99,6 +163,16 @@ export const createListRouter = (
 		),
 		workspaceMatchMiddleware(Repository),
 		listController.deleteList
+	);
+
+	router.delete(
+		'/workspaces/:workspaceId/status/:id',
+		workspacePermissionMiddleware(
+			memberRepo,
+			['admin', 'member'],
+			workspaceRepo
+		),
+		listController.deleteStatus
 	);
 
 	router.delete(

@@ -25,7 +25,6 @@ export function AuthController(userRepo) {
 					maxAge: remember ? t * 50 : t * 2,
 				};
 				const user = await authenticateUseCase(req.body);
-				console.log(user);
 				await asignAccessToken(res, token_config, { id: user.id });
 				res.json(user);
 			} catch (err) {
